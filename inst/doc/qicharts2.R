@@ -21,10 +21,9 @@ paretochart(unlist(gtt[7:11]),
             title = 'Pareto chart of patient harm during hospitalisation')
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  # Install stable version from CRAN:
 #  install.packages('qicharts2')
-#  # OR
-#  # Install development version from GitHub:
+
+## ---- eval=FALSE---------------------------------------------------------
 #  devtools::install_github('anhoej/qicharts2', build_vignettes = TRUE)
 
 ## ------------------------------------------------------------------------
