@@ -1,10 +1,10 @@
-62e70e2222b24e230a3b52da89ce6c0a *DESCRIPTION
+e3f0b8b6b9062368f90dcfd34251e87e *DESCRIPTION
 06028109ef60a3272ae8d6f4380bb086 *NAMESPACE
-522125a79becbad773dbc0d5252c5c27 *NEWS
+b2e4cc2d34eebfd1c5fe812ee1aeb829 *NEWS
 be11bfb58098965d146c76450c7fde87 *R/data.R
 f3a1a1d968947845ae2f8f3acee8ce5c *R/helper.functions.R
 1d329d69bc12c42a8f8e49fc8802b9e6 *R/paretochart.R
-2fcb44e93c6c771d5b0a2c7acea2f3a4 *R/qic.R
+d1200518661ab8d540b2e0e5861a0ea7 *R/qic.R
 f1bf281256bfd019e83b5e0957f9113b *R/qic.plot.R
 b9258b8570582c8242285732c27c7947 *R/qic.summary.R
 5afda17fd80a07ecce943669edc1581f *R/qicharts2.R
@@ -18,7 +18,7 @@ d73e7618e0362a429bb74148da84e7fb *data/hospital_infections.rda
 1bd795325f219ee7cac85d3333282d1a *data/nhs_accidents.rda
 5f7d181c418cbbed2247ecb241792742 *inst/doc/qicharts2.R
 7cef4ef61958193115761f48b3cea585 *inst/doc/qicharts2.Rmd
-be4df2fdb44d9d52c5842757bffc6662 *inst/doc/qicharts2.html
+8ffcef82526af43f153f6b833cc85578 *inst/doc/qicharts2.html
 549f94f72a8eb2ad8fe2ecda3de9d649 *man/cabg.Rd
 7c98f75947cfc2094f7624987f6bed82 *man/cdi.Rd
 1b1bd89f1d70c592d9ea6293a7699e46 *man/gtt.Rd
@@ -47,5 +47,5 @@ c1e7aa4176d0107e2cba235d39fbf714 *tests/testthat/hai_3.rds
 6fca04cb119daa49b2b99002739f2a26 *tests/testthat/hai_4.rds
 ba0ddcb2792d263b69a9aa8eb13b67ad *tests/testthat/tbl_7.4_1.rds
 07c18743e4f126cb923aa3efa7013696 *tests/testthat/test_hai.R
-bf4229e368aaa1dd6595ca1f9b99c551 *tests/testthat/test_montgomery.R
+a996c49ef8578e1c11f4ef627433bc3f *tests/testthat/test_montgomery.R
 7cef4ef61958193115761f48b3cea585 *vignettes/qicharts2.Rmd

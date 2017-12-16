@@ -1,3 +1,11 @@
+qicharts2 0.2.3
+===============
+* Skip tests that generate noLD issues on CRAN.
+
+qicharts2 0.2.2
+===============
+* Fix time zone warnings on Windows environment.
+
 qicharts2 0.2.1
 ===============
 * Fix x axis error when dates crosses summer/winter time.
