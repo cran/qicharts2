@@ -1,7 +1,9 @@
 #' @import ggplot2
 plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
-                     nrow, ncol, scales, show.labels, show.grid, decimals, 
-                     flip, dots.only, x.format, x.angle, x.pad, y.expand, y.percent,
+                     nrow, ncol, scales, show.labels, show.grid, 
+                     # show.sigma.lines, 
+                     decimals, flip, dots.only, x.format,
+                     x.angle, x.pad, y.expand, y.percent, strip.horizontal,
                      ...) {
   # Set colours
   col1      <- '#8C8C8C' # rgb(140, 140, 140, maxColorValue = 255) # grey
@@ -48,11 +50,21 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   p <- p +
     geom_ribbon(aes_(ymin = ~ lcl, ymax = ~ ucl),
                 fill = 'grey80',
-                alpha = 0.25) +
-    geom_line(aes_(y = ~ target),
-              colour = col4,
-              linetype = 5,
-              size = 0.5) +
+                alpha = 0.4)
+  
+  # if(show.sigma.lines) {
+  #   p <- p +
+  #   geom_line(aes_(y = ~ cl + (ucl - cl) / 3), colour = 'white') +
+  #   geom_line(aes_(y = ~ cl + (ucl - cl) / 3 * 2), colour = 'white') +
+  #   geom_line(aes_(y = ~ cl - (ucl - cl) / 3), colour = 'white') +
+  #   geom_line(aes_(y = ~ cl - (ucl - cl) / 3 * 2), colour = 'white') +
+  #   geom_line(aes_(y = ~ target),
+  #             colour = col4,
+  #             linetype = 5,
+  #             size = 0.5)
+  # }
+  
+  p <- p +
     geom_line(aes_(y = ~ cl, linetype = ~ runs.signal, colour = ~ linecol),
               na.rm = TRUE) +
     scale_linetype_manual(values = c('FALSE' = 'solid', 'TRUE' = 'dashed'))
@@ -210,5 +222,11 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
     p <- p + coord_flip()
   }
   
+  # Horizontal y strip
+  if (strip.horizontal)
+    p <- p + theme(strip.text.y = element_text(angle = 0,
+                                               hjust = 0),
+                   strip.background = element_blank())
+
   return(p)
 }

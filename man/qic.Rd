@@ -8,12 +8,12 @@ qic(x, y = NULL, n = NULL, data = NULL, facets = NULL, notes = NULL,
   chart = c("run", "i", "mr", "xbar", "s", "t", "p", "pp", "c", "u", "up",
   "g"), agg.fun = c("mean", "median", "sum", "sd"), multiply = 1,
   freeze = NULL, part = NULL, exclude = NULL, target = NA * 1, cl = NA
-  * 1, nrow = NULL, ncol = NULL, scales = "fixed", title = NULL,
+  * 1, nrow = NULL, ncol = NULL, scales = "fixed", title = "",
   ylab = "Value", xlab = "Subgroup", subtitle = NULL, caption = NULL,
   part.labels = NULL, show.labels = is.null(facets), decimals = 1,
   x.format = NULL, x.angle = NULL, x.pad = 1, y.expand = NULL,
   y.neg = TRUE, y.percent = FALSE, show.grid = FALSE, flip = FALSE,
-  print.summary = FALSE)
+  strip.horizontal = FALSE, print.summary = FALSE)
 }
 \arguments{
 \item{x}{Vector of subgroup values to plot along the x axis.}
@@ -96,9 +96,11 @@ relevant for I and Xbar charts).}
 
 \item{y.percent}{If TRUE, formats y axis labels as percentages.}
 
-\item{show.grid}{If TRUE shows grid.}
+\item{show.grid}{If TRUE, shows grid.}
 
 \item{flip}{If TRUE, rotates the plot 90 degrees.}
+
+\item{strip.horizontal}{If TRUE, makes y strip horizontal.}
 
 \item{print.summary}{If TRUE, prints summary.}
 }

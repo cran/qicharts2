@@ -59,8 +59,9 @@
 #' @param y.neg If TRUE (default), the y axis is allowed to be negative (only 
 #'   relevant for I and Xbar charts).
 #' @param y.percent If TRUE, formats y axis labels as percentages.
-#' @param show.grid If TRUE shows grid.
+#' @param show.grid If TRUE, shows grid.
 #' @param flip If TRUE, rotates the plot 90 degrees.
+#' @param strip.horizontal If TRUE, makes y strip horizontal.
 #' @param print.summary If TRUE, prints summary.
 # @param ... Additional arguments to plot function.
 #'   
@@ -97,40 +98,42 @@
 #' @export
 
 qic <- function(x,
-                y             = NULL,
-                n             = NULL,
-                data          = NULL,
-                facets        = NULL,
-                notes         = NULL,
-                chart         = c('run', 'i', 'mr', 'xbar', 's', 't',
-                                  'p', 'pp', 'c', 'u', 'up', 'g'),
-                agg.fun       = c('mean', 'median', 'sum', 'sd'),
-                multiply      = 1,
-                freeze        = NULL,
-                part          = NULL,
-                exclude       = NULL,
-                target        = NA * 1,
-                cl            = NA * 1, #NULL,
-                nrow          = NULL,
-                ncol          = NULL,
-                scales        = 'fixed',
-                title         = NULL,
-                ylab          = 'Value',
-                xlab          = 'Subgroup',
-                subtitle      = NULL,
-                caption       = NULL,
-                part.labels   = NULL,
-                show.labels   = is.null(facets),
-                decimals      = 1,
-                x.format      = NULL,
-                x.angle       = NULL,
-                x.pad         = 1,
-                y.expand      = NULL,
-                y.neg         = TRUE,
-                y.percent     = FALSE,
-                show.grid     = FALSE,
-                flip          = FALSE,
-                print.summary = FALSE) {
+                y                = NULL,
+                n                = NULL,
+                data             = NULL,
+                facets           = NULL,
+                notes            = NULL,
+                chart            = c('run', 'i', 'mr', 'xbar', 's', 't',
+                                     'p', 'pp', 'c', 'u', 'up', 'g'),
+                agg.fun          = c('mean', 'median', 'sum', 'sd'),
+                multiply         = 1,
+                freeze           = NULL,
+                part             = NULL,
+                exclude          = NULL,
+                target           = NA * 1,
+                cl               = NA * 1, #NULL,
+                nrow             = NULL,
+                ncol             = NULL,
+                scales           = 'fixed',
+                title            = '',
+                ylab             = 'Value',
+                xlab             = 'Subgroup',
+                subtitle         = NULL,
+                caption          = NULL,
+                part.labels      = NULL,
+                show.labels      = is.null(facets),
+                decimals         = 1,
+                x.format         = NULL,
+                x.angle          = NULL,
+                x.pad            = 1,
+                y.expand         = NULL,
+                y.neg            = TRUE,
+                y.percent        = FALSE,
+                show.grid        = FALSE,
+                # show.sigma.lines = FALSE,
+                flip             = FALSE,
+                strip.horizontal = FALSE,
+                print.summary    = FALSE) {
   
   # Check data
   if (missing(x))
@@ -152,9 +155,9 @@ qic <- function(x,
   if (multiply != 1)  
     y.name <- paste(y.name, 'x', multiply)
   
-  if (is.null(title)) 
+  if (!is.null(title) && title == '') 
     title <- paste(toupper(match.arg(chart)), 'Chart', 'of', y.name)
-  
+ 
   # Get chart type
   chart.fun <- get(paste0('qic.', match.arg(chart)))
   
@@ -233,33 +236,32 @@ qic <- function(x,
 
   # Build plot
   p <- plot.qic(d, 
-                title           = title, 
-                xlab            = xlab, 
-                ylab            = ylab,
-                subtitle        = subtitle, 
-                caption         = caption, 
-                part.labels     = part.labels, 
-                nrow            = nrow, 
-                ncol            = ncol, 
-                scales          = scales,
-                show.labels     = show.labels,
-                show.grid       = show.grid,
-                decimals        = decimals,
-                flip            = flip,
-                dots.only       = dots.only,
-                x.format        = x.format,
-                x.angle         = x.angle,
-                x.pad           = x.pad,
-                y.expand        = y.expand,
-                y.percent       = y.percent)
+                title            = title, 
+                xlab             = xlab, 
+                ylab             = ylab,
+                subtitle         = subtitle, 
+                caption          = caption, 
+                part.labels      = part.labels, 
+                nrow             = nrow, 
+                ncol             = ncol, 
+                scales           = scales,
+                show.labels      = show.labels,
+                show.grid        = show.grid,
+                # show.sigma.lines = show.sigma.lines,
+                decimals         = decimals,
+                flip             = flip,
+                dots.only        = dots.only,
+                x.format         = x.format,
+                x.angle          = x.angle,
+                x.pad            = x.pad,
+                y.expand         = y.expand,
+                y.percent        = y.percent,
+                strip.horizontal = strip.horizontal)
   
   class(p) <- c('qic', class(p))
   
   # Tell how data was aggregated  
-  if(!got.n & 
-     match.arg(chart) %in% c('run', 'i') &
-     # match.arg(agg.fun) == 'mean' &
-     max(d$y.length > 1))
+  if(!got.n & match.arg(chart) %in% c('run', 'i') & max(d$y.length > 1))
     message(paste0('Subgroup size > 1. Data have been aggregated using ', 
                   agg.fun, '().'))
   
