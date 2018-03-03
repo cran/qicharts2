@@ -1,9 +1,9 @@
 #' @import ggplot2
 plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
                      nrow, ncol, scales, show.labels, show.grid, 
-                     # show.sigma.lines, 
-                     decimals, flip, dots.only, x.format,
-                     x.angle, x.pad, y.expand, y.percent, strip.horizontal,
+                     decimals, flip, dots.only, point.size,
+                     x.format, x.angle, x.pad,
+                     y.expand, y.percent, strip.horizontal,
                      ...) {
   # Set colours
   col1      <- '#8C8C8C' # rgb(140, 140, 140, maxColorValue = 255) # grey
@@ -49,51 +49,22 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   # Add control limits and centre and target lines
   p <- p +
     geom_ribbon(aes_(ymin = ~ lcl, ymax = ~ ucl),
-                fill = 'grey80',
+                fill = 'grey87',
                 alpha = 0.4)
-  
-  # if(show.sigma.lines) {
-  #   p <- p +
-  #   geom_line(aes_(y = ~ cl + (ucl - cl) / 3), colour = 'white') +
-  #   geom_line(aes_(y = ~ cl + (ucl - cl) / 3 * 2), colour = 'white') +
-  #   geom_line(aes_(y = ~ cl - (ucl - cl) / 3), colour = 'white') +
-  #   geom_line(aes_(y = ~ cl - (ucl - cl) / 3 * 2), colour = 'white') +
-  #   geom_line(aes_(y = ~ target),
-  #             colour = col4,
-  #             linetype = 5,
-  #             size = 0.5)
-  # }
-  
+
   p <- p +
     geom_line(aes_(y = ~ cl, linetype = ~ runs.signal, colour = ~ linecol),
               na.rm = TRUE) +
     scale_linetype_manual(values = c('FALSE' = 'solid', 'TRUE' = 'dashed'))
   
-  # Add notes
-  x.notes <- x[!is.na(x$notes), ]
-  
-  if (nrow(x.notes)) {
-    p <- p +
-      geom_segment(aes_(xend = ~ x, yend = Inf),
-                   data = x.notes,
-                   linetype = 3,
-                   colour = col1) +
-      geom_label(aes_(y = Inf, label = ~ notes),
-                 data = x.notes,
-                 label.size = 0.1,
-                 size = lab.size,
-                 alpha = 0.9,
-                 vjust = ifelse(flip, 'center', 'inward'),
-                 hjust = ifelse(flip, 'inward', 'center'))
-  }
-  
   # Add data points and line
   if (dots.only) {
-    p <- p + geom_point(aes_(colour = ~ dotcol), size = 3, na.rm = TRUE)
+    p <- p + 
+      geom_point(aes_(colour = ~ dotcol), size = 3 * point.size, na.rm = TRUE)
   } else {
     p <- p +
       geom_line(colour = col2, size = 1.1, na.rm = TRUE) +
-      geom_point(aes_(colour = ~ dotcol), na.rm = TRUE)
+      geom_point(aes_(colour = ~ dotcol), size = point.size, na.rm = TRUE)
   }
   p <- p + scale_colour_manual(values = cols)
   
@@ -152,14 +123,34 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
         geom_label(aes_(y = ~ y, label = ~ z, group = 1), 
                    data = plabs,
                    na.rm = T,
-                   label.size = 0.1,
+                   label.size = 0,
+                   label.padding = unit(0.5, 'lines'),
                    size = lab.size,
-                   alpha = 0.9,
+                   alpha = 0.5,
                    vjust = ifelse(flip, 'center', 'inward'),
                    hjust = ifelse(flip, 'inward', 'center'))
     } else {
       warning('Length of part.labels argument must match the number of parts to label.')
     }
+  }
+  
+  # Add notes
+  x.notes <- x[!is.na(x$notes), ]
+  
+  if (nrow(x.notes)) {
+    p <- p +
+      geom_segment(aes_(xend = ~ x, yend = Inf),
+                   data = x.notes,
+                   linetype = 3,
+                   colour = col1) +
+      geom_label(aes_(y = Inf, label = ~ notes),
+                 data = x.notes,
+                 label.size = NA,
+                 label.padding = unit(0.3, 'lines'),
+                 size = lab.size,
+                 alpha = 0.5,
+                 vjust = ifelse(flip, 'center', 'inward'),
+                 hjust = ifelse(flip, 'inward', 'center'))
   }
   
   # Facets

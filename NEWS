@@ -1,3 +1,10 @@
+qicharts2 0.4.0
+===============
+* Fix quoted variables.
+* Darker CL background.
+* Add point.size argument.
+* Improved notes and parts labels.
+
 qicharts2 0.3.0
 ===============
 * Skip more tests that generate noLD issues on CRAN.

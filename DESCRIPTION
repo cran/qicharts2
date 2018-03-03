@@ -1,7 +1,7 @@
 Package: qicharts2
 Title: Quality Improvement Charts
-Version: 0.3.0
-Date: 2018-02-03
+Version: 0.4.0
+Date: 2018-03-03
 Authors@R: person('Jacob', 'Anhoej', email = 'jacob@anhoej.net',
     role = c('aut', 'cre'))
 Description: Functions for making run charts, Shewhart control charts and
@@ -23,8 +23,8 @@ RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 URL: https://github.com/anhoej/qicharts2
 NeedsCompilation: no
-Packaged: 2018-02-03 16:32:34 UTC; jacob
+Packaged: 2018-03-03 10:40:04 UTC; jacob
 Author: Jacob Anhoej [aut, cre]
 Maintainer: Jacob Anhoej <jacob@anhoej.net>
 Repository: CRAN
-Date/Publication: 2018-02-03 16:55:53 UTC
+Date/Publication: 2018-03-03 10:55:35 UTC
