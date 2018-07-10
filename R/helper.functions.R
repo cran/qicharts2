@@ -7,7 +7,7 @@ runs.analysis <- function(x) {
   n.useful           <- length(runs)
   n.obs <- length(y)
   
-  if(n.useful) {
+  if (n.useful) {
     run.lengths      <- rle(runs)$lengths
     n.runs           <- length(run.lengths)
     longest.run      <- max(run.lengths)
@@ -88,8 +88,9 @@ qic.mr <- function(x) {
 }
 
 qic.xbar <- function(x){
-  base <- x$baseline & x$include
+  base  <- x$baseline & x$include
   var.n <- as.logical(length(unique(x$y.length)) - 1)
+
   # Calculate centre line, Montgomery 6.30
   if (anyNA(x$cl)) {
     x$cl <- sum(x$y.length[base] * x$y.mean[base], na.rm = TRUE) /
@@ -111,10 +112,9 @@ qic.xbar <- function(x){
 }
 
 qic.s <- function(x){
-  base <- x$baseline & x$include
+  base  <- x$baseline & x$include
   var.n <- as.logical(length(unique(x$y.length)) - 1)
-  
-  x$y <- x$y.sd
+  x$y   <- x$y.sd
   
   # Calculate centre line and control limits
   if (anyNA(x$cl)) {
@@ -135,16 +135,16 @@ qic.s <- function(x){
 }
 
 qic.t <- function(x) {
-  if(min(x$y, na.rm = TRUE) <= 0) {
+  if (min(x$y, na.rm = TRUE) <= 0) {
     stop('Time between events must be greater than zero')
   }
   
   # Transform y variable and run I chart calculations
   x$y <- x$y^(1 / 3.6)
-  x <- qic.i(x)
+  x   <- qic.i(x)
   
   # Back transform centre line and control limits
-  x$y <- x$y^3.6
+  x$y   <- x$y^3.6
   x$cl  <- x$cl^3.6
   x$ucl <- x$ucl^3.6
   x$lcl <- x$lcl^3.6
@@ -285,62 +285,88 @@ qic.g <- function(x){
   return(x)
 }
 
+c4 <- function(n) {
+  n[n <= 1] <- NA
+  sqrt(2 / (n - 1)) * gamma(n / 2) / gamma((n - 1) / 2)
+}
+
+c5 <- function(n) {
+  n[n <= 1] <- NA
+  sqrt(1 - c4(n) ^ 2)
+}
+
 a3 <- function(n) {
-  n[n == 0]    <- NA
-  tbl          <- c(NA,
-                    2.659, 1.954, 1.628, 1.427, 1.287, 1.182,
-                    1.099, 1.032, 0.975, 0.927, 0.886, 0.850,
-                    0.817, 0.789, 0.763, 0.739, 0.718, 0.698,
-                    0.680, 0.663, 0.647, 0.633, 0.619, 0.606)
-  x            <- 3 / (4 * (n - 1)) * (4 * n - 3) / sqrt(n)
-  w            <- which(n <= 25)
-  x[w]         <- tbl[n[w]]
-  x[is.nan(x)] <- NA
-  return(x)
+  n[n <= 1] <- NA
+  3 / (c4(n) * sqrt(n))
 }
 
 b3 <- function(n) {
-  n[n == 0]    <- NA
-  tbl          <- c(NA,
-                    0.000, 0.000, 0.000, 0.000, 0.030, 0.118,
-                    0.185, 0.239, 0.284, 0.321, 0.354, 0.382,
-                    0.406, 0.428, 0.448, 0.466, 0.482, 0.497,
-                    0.510, 0.523, 0.534, 0.545, 0.555, 0.565)
-  x            <- 1 - (3 / c4(n) / sqrt(2 * (n - 1)))
-  w            <- which(n <= 25)
-  x[w]         <- tbl[n[w]]
-  x[is.nan(x)] <- NA
-  return(x)
+  n[n <= 1] <- NA
+  pmax(0, 1 - 3 * c5(n) / c4(n))
 }
 
 b4 <- function(n) {
-  n[n == 0]    <- NA
-  tbl          <- c(NA,
-                    3.267, 2.568, 2.266, 2.089, 1.970, 1.882,
-                    1.815, 1.761, 1.716, 1.679, 1.646, 1.618,
-                    1.594, 1.572, 1.552, 1.534, 1.518, 1.503,
-                    1.490, 1.477, 1.466, 1.455, 1.445, 1.435)
-  x            <- 1 + (3 / c4(n) / sqrt(2 * (n - 1)))
-  w            <- which(n <= 25)
-  x[w]         <- tbl[n[w]]
-  x[is.nan(x)] <- NA
-  return(x)
+  n[n <= 1] <- NA
+  1 + 3 * c5(n) / c4(n)
 }
 
-c4 <- function(n) {
-  n[n == 0]   <- NA
-  tbl         <- c(NA,
-                   0.7979, 0.8862, 0.9213, 0.9400, 0.9515, 0.9594,
-                   0.9650, 0.9693, 0.9727, 0.9754, 0.9776, 0.9794,
-                   0.9810, 0.9823, 0.9835, 0.9845, 0.9854, 0.9862,
-                   0.9869, 0.9876, 0.9882, 0.9887, 0.9892, 0.9896)
-  
-  x            <- 4 * (n - 1) / (4 * n - 3)
-  w            <- which(n <= 25)
-  x[w]         <- tbl[n[w]]
-  x[is.nan(x)] <- NA
-  return(x)
-}
+# a3 <- function(n) {
+#   n[n == 0]    <- NA
+#   tbl          <- c(NA,
+#                     2.659, 1.954, 1.628, 1.427, 1.287, 1.182,
+#                     1.099, 1.032, 0.975, 0.927, 0.886, 0.850,
+#                     0.817, 0.789, 0.763, 0.739, 0.718, 0.698,
+#                     0.680, 0.663, 0.647, 0.633, 0.619, 0.606)
+#   # x            <- 3 / (4 * (n - 1)) * (4 * n - 3) / sqrt(n)
+#   x            <- 3 / c4(n) / sqrt(n)
+#   w            <- which(n <= 25)
+#   x[w]         <- tbl[n[w]]
+#   x[is.nan(x)] <- NA
+#   return(x)
+# }
+# 
+# b3 <- function(n) {
+#   n[n == 0]    <- NA
+#   tbl          <- c(NA,
+#                     0.000, 0.000, 0.000, 0.000, 0.030, 0.118,
+#                     0.185, 0.239, 0.284, 0.321, 0.354, 0.382,
+#                     0.406, 0.428, 0.448, 0.466, 0.482, 0.497,
+#                     0.510, 0.523, 0.534, 0.545, 0.555, 0.565)
+#   x            <- 1 - (3 / c4(n) / sqrt(2 * (n - 1)))
+#   w            <- which(n <= 25)
+#   x[w]         <- tbl[n[w]]
+#   x[is.nan(x)] <- NA
+#   return(x)
+# }
+# 
+# b4 <- function(n) {
+#   n[n == 0]    <- NA
+#   tbl          <- c(NA,
+#                     3.267, 2.568, 2.266, 2.089, 1.970, 1.882,
+#                     1.815, 1.761, 1.716, 1.679, 1.646, 1.618,
+#                     1.594, 1.572, 1.552, 1.534, 1.518, 1.503,
+#                     1.490, 1.477, 1.466, 1.455, 1.445, 1.435)
+#   x            <- 1 + (3 / c4(n) / sqrt(2 * (n - 1)))
+#   w            <- which(n <= 25)
+#   x[w]         <- tbl[n[w]]
+#   x[is.nan(x)] <- NA
+#   return(x)
+# }
+# 
+# c4 <- function(n) {
+#   n[n == 0]   <- NA
+#   tbl         <- c(NA,
+#                    0.7979, 0.8862, 0.9213, 0.9400, 0.9515, 0.9594,
+#                    0.9650, 0.9693, 0.9727, 0.9754, 0.9776, 0.9794,
+#                    0.9810, 0.9823, 0.9835, 0.9845, 0.9854, 0.9862,
+#                    0.9869, 0.9876, 0.9882, 0.9887, 0.9892, 0.9896)
+#   
+#   x            <- 4 * (n - 1) / (4 * n - 3)
+#   w            <- which(n <= 25)
+#   x[w]         <- tbl[n[w]]
+#   x[is.nan(x)] <- NA
+#   return(x)
+# }
 
 # Format line labels function
 lab.format <- function(x, decimals = 1, percent = FALSE) {
@@ -378,7 +404,7 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
   notes  <- quo(notes)
   facet1 <- quo(facet1)
   facet2 <- quo(facet2)
-
+  
   d <- d %>% 
     filter(!is.na(!!x)) %>% 
     group_by(!!x, !!facet1, !!facet2) %>% 
@@ -406,17 +432,17 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
     lapply(chart.fun) %>% 
     lapply(runs.analysis) %>% 
     lapply(function(x) {
-                within(x, {
-                  y          <- y * multiply
-                  cl         <- cl * multiply
-                  lcl        <- lcl * multiply
-                  ucl        <- ucl * multiply
-                  cl.lab     <- ifelse(xx == max(xx), cl, NA)
-                  lcl.lab    <- ifelse(xx == max(xx), lcl, NA)
-                  ucl.lab    <- ifelse(xx == max(xx), ucl, NA)
-                  target.lab <- ifelse(xx == max(xx), target, NA)
-                })
-              })
+      within(x, {
+        y          <- y * multiply
+        cl         <- cl * multiply
+        lcl        <- lcl * multiply
+        ucl        <- ucl * multiply
+        cl.lab     <- ifelse(xx == max(xx), cl, NA)
+        lcl.lab    <- ifelse(xx == max(xx), lcl, NA)
+        ucl.lab    <- ifelse(xx == max(xx), ucl, NA)
+        target.lab <- ifelse(xx == max(xx), target, NA)
+      })
+    })
   
   d <- do.call(rbind, d) %>% 
     arrange(!!facet1, !!facet2, !!x)
@@ -432,7 +458,7 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
   # Ignore runs analysis if subgroups are categorical or if chart type is MR
   if (dots.only || chart == 'mr')
     d$runs.signal <- FALSE
-
+  
   # Prevent negative y axis if y.neg argument is FALSE
   if (!y.neg & min(d$y, na.rm = TRUE) >= 0) {
     d$lcl[d$lcl < 0]         <- 0
@@ -440,4 +466,18 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
   }
   
   return(d)
+}
+
+.onAttach <- function(libname, pkgname) {
+  options(qic.linecol   = '#5DA5DA',
+          qic.signalcol = '#F15854',
+          qic.targetcol = '#059748',
+          qic.clshade   = TRUE)
+}
+
+.onDetach <- function(libpath) {
+  options(qic.linecol = NULL,
+          qic.signalcol = NULL,
+          qic.targetcol = NULL,
+          qic.clshade   = NULL)
 }

@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/anhoej/qicharts2.svg?branch=master)](https://travis-ci.org/anhoej/qicharts2)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/qicharts2)](https://cran.r-project.org/package=qicharts2)
+[![DOI](https://zenodo.org/badge/96605963.svg)](https://zenodo.org/badge/latestdoi/96605963)
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.00699/status.svg)](https://doi.org/10.21105/joss.00699)
 
 # Quality improvement charts for R
 
@@ -7,7 +9,7 @@
 
 Non-random variation in the form of minor to moderate persistent shifts in data over time is identified by the Anhoej rules for unusually long runs and unusually few crossing [Anhoej, Olesen (2014) https://doi.org/10.1371/journal.pone.0113825].
 
-Non-random variation in the form of larger, possibly transient, shifts is identified by Shewhart's 3-sigma rule [Mohammed, Worthington, Woodall (2008) http://dx.doi.org/10.1136/qshc.2004.012047].
+Non-random variation in the form of larger, possibly transient, shifts is identified by Shewhart's 3-sigma rule [Mohammed, Worthington, Woodall (2008) https://doi.org/10.1136/qshc.2004.012047].
 
 ## Exported functions
 

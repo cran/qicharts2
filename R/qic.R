@@ -30,10 +30,10 @@
 #'   recalculation of centre and control lines.
 #' @param exclude Integer vector indicating data points to exclude from 
 #'   calculations of centre and control lines.
-#' @param target Numeric value indicating a target value to be plotted as a 
-#'   horizontal line (same for each facet).
-#' @param cl Numeric, either a value indicating the centre line if known in 
-#'   advance or a vector if centre line is variable.
+#' @param target Numeric, either a single value indicating a target value to be plotted as a 
+#'   horizontal line or a vector for variable target line.
+#' @param cl Numeric, either a single value indicating the centre line if known in 
+#'   advance or a vector for variable centre line.
 #' @param nrow,ncol Number indicating the preferred number of rows and columns 
 #'   in facets.
 #' @param scales Character string, one of 'fixed' (default), 'free_y', 'free_x',
@@ -51,6 +51,9 @@
 #' @param decimals Integer indicating the preferred number of decimals in centre
 #'   and control line labels.
 #' @param point.size Number specifying the size of data points.
+#' @param x.period Character string specifying the interval cut points of 
+#'   datetime x values used for aggregating y values by week, month, etc.
+#'   See the breaks argument of \code{?cut.POSIXt()} for possible values.
 #' @param x.format Date format of x axis labels. See \code{?strftime()} for 
 #'   possible date formats.
 #' @param x.angle Number indicating the angle of x axis labels.
@@ -125,6 +128,7 @@ qic <- function(x,
                 show.labels      = is.null(facets),
                 decimals         = 1,
                 point.size       = 1,
+                x.period         = NULL,
                 x.format         = NULL,
                 x.angle          = NULL,
                 x.pad            = 1,
@@ -160,7 +164,8 @@ qic <- function(x,
     title <- paste(toupper(match.arg(chart)), 'Chart', 'of', y.name)
  
   # Get chart type
-  chart.fun <- get(paste0('qic.', match.arg(chart)))
+  chart     <- match.arg(chart)
+  chart.fun <- get(paste0('qic.', chart))
   
   # Get aggregate function
   agg.fun <- match.arg(agg.fun)
@@ -217,8 +222,12 @@ qic <- function(x,
   dots.only <- is.factor(x) || mode(x) != 'numeric'
   
   # Convert dates and datetimes to POSIXct
-  if (inherits(x, c('Date', 'POSIXt')))
+  if (inherits(x, c('Date', 'POSIXt'))) {
     x <- as.POSIXct(as.character(x), tz = 'UTC')
+    if (!missing(x.period)) {
+      x <- as.POSIXct(cut(x, breaks = x.period))
+    }
+  }
   
   # Fix missing values
   if (got.n) {
@@ -234,6 +243,15 @@ qic <- function(x,
   # Aggregate data and perform analyses
   d <- qic.agg(d, got.n, part, agg.fun, freeze, exclude, 
                chart.fun, multiply, dots.only, chart, y.neg)
+  
+  # Format y for p charts
+  if (missing(y.percent) & chart %in% c('p', 'pp')) {
+    y.percent <- TRUE
+  }
+  
+  if (y.percent & missing(ylab)) {
+    ylab <- NULL
+  }
 
   # Build plot
   p <- plot.qic(d, 

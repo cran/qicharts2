@@ -4,12 +4,15 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
                      decimals, flip, dots.only, point.size,
                      x.format, x.angle, x.pad,
                      y.expand, y.percent, strip.horizontal,
+                     col.line = '#5DA5DA', 
+                     col.signal = '#F15854', 
+                     col.target = '#059748',
                      ...) {
   # Set colours
   col1      <- '#8C8C8C' # rgb(140, 140, 140, maxColorValue = 255) # grey
-  col2      <- '#5DA5DA' # rgb(093, 165, 218, maxColorValue = 255) # blue
-  col3      <- '#F15854' # rgb(241, 088, 084, maxColorValue = 255) # red
-  col4      <- '#059748' # rgb(005, 151, 072, maxColorValue = 255) # green
+  col2      <- getOption('qic.linecol') #'#5DA5DA' # rgb(093, 165, 218, maxColorValue = 255) # blue
+  col3      <- getOption('qic.signalcol') #'#F15854' # rgb(241, 088, 084, maxColorValue = 255) # red
+  col4      <- getOption('qic.targetcol') #'#059748' # rgb(005, 151, 072, maxColorValue = 255) # green
   col5      <- '#C8C8C8' # rgb(200, 200, 200, maxColorValue = 255) # light grey
   cols      <- c('col1' = col1,
                  'col2' = col2,
@@ -20,7 +23,7 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   x$dotcol  <- ifelse(x$include, x$dotcol, 'col5')
   x$dotcol  <- ifelse(x$y == x$cl, 'col5', x$dotcol)
   x$linecol <- ifelse(x$runs.signal, 'col3', 'col1')
-
+  
   # Set label parameters
   lab.size <- 3
   lab.just <- ifelse(flip, 'center', -0.2)
@@ -47,11 +50,24 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
           legend.position  = 'none')
   
   # Add control limits and centre and target lines
+  
+  if (getOption('qic.clshade')) {
+    
+    p <- p +
+      geom_ribbon(aes_(ymin = ~ lcl, ymax = ~ ucl),
+                  fill = 'grey87',
+                  alpha = 0.4)
+  } else {
+    p <- p +
+      geom_line(aes_(y = ~ lcl), colour = col1, na.rm = T)
+    
+    p <- p +
+      geom_line(aes_(y = ~ ucl), colour = col1, na.rm = T)
+  }
+  
   p <- p +
-    geom_ribbon(aes_(ymin = ~ lcl, ymax = ~ ucl),
-                fill = 'grey87',
-                alpha = 0.4)
-
+    geom_line(aes_(y = ~ target), colour = col4, na.rm = T)
+  
   p <- p +
     geom_line(aes_(y = ~ cl, linetype = ~ runs.signal, colour = ~ linecol),
               na.rm = TRUE) +
@@ -72,25 +88,25 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   if (show.labels) {
     p <- p +
       geom_text(aes_(y = ~ target.lab,
-                      label = ~ lab.format(target.lab, decimals, y.percent)),
-                 na.rm = TRUE,
-                 size = lab.size,
-                 hjust = lab.just) +
+                     label = ~ lab.format(target.lab, decimals, y.percent)),
+                na.rm = TRUE,
+                size = lab.size,
+                hjust = lab.just) +
       geom_text(aes_(y = ~ lcl.lab,
-                      label = ~ lab.format(lcl.lab, decimals, y.percent)),
-                 na.rm = TRUE,
-                 size = lab.size,
-                 hjust = lab.just) +
+                     label = ~ lab.format(lcl.lab, decimals, y.percent)),
+                na.rm = TRUE,
+                size = lab.size,
+                hjust = lab.just) +
       geom_text(aes_(y = ~ ucl.lab,
-                      label = ~ lab.format(ucl.lab, decimals, y.percent)),
-                 na.rm = TRUE,
-                 size = lab.size,
-                 hjust = lab.just) +
+                     label = ~ lab.format(ucl.lab, decimals, y.percent)),
+                na.rm = TRUE,
+                size = lab.size,
+                hjust = lab.just) +
       geom_text(aes_(y = ~ cl.lab,
-                      label = ~ lab.format(cl.lab, decimals, y.percent)),
-                 na.rm = TRUE,
-                 size = lab.size,
-                 hjust = lab.just)
+                     label = ~ lab.format(cl.lab, decimals, y.percent)),
+                na.rm = TRUE,
+                size = lab.size,
+                hjust = lab.just)
   }
   
   # Add freeze line and part labels
@@ -118,7 +134,7 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
       if (inherits(x$x, 'POSIXct')) {
         plabs$x <- as.POSIXct(plabs$x, origin = '1970-01-01')
       }
-
+      
       p <- p +
         geom_label(aes_(y = ~ y, label = ~ z, group = 1), 
                    data = plabs,
@@ -192,13 +208,13 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   if (y.percent) {
     p <- p + scale_y_continuous(labels = scales::percent)
   }
-
+  
   # Add space for line labels
   subgroups <- unique(x$x)
   
   if (is.factor(subgroups))
     subgroups <- as.numeric(subgroups)
-
+  
   p <- p +
     expand_limits(x = max((subgroups)) +
                     diff(range((subgroups))) / 30 * x.pad * show.labels)
@@ -218,6 +234,6 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
     p <- p + theme(strip.text.y = element_text(angle = 0,
                                                hjust = 0),
                    strip.background = element_blank())
-
+  
   return(p)
 }

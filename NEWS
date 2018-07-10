@@ -1,3 +1,14 @@
+qicharts2 0.5.1
+===============
+* Fix missing target line.
+* Use exact values for control chart constants A3, B3, and B4 (thanks to Tore Wenzel-Larsen).
+* Add x.period argument specifying interval cut points for aggregating y values by week, month, etc. (thanks to pwildenhain)
+* P charts default to percentage on Y axis (thanks to pwildehain).
+* Add qic.linecol, qic.signalcol, and qic.targetcol to options to allow for custom colours.
+* Add qic.clshade to options to allow for choosing between lines and shaded area for control limits.
+* Fix typos in vignette (thanks to rmadillo).
+* Add source to cabg and gtt datasets.
+
 qicharts2 0.4.0
 ===============
 * Fix quoted variables.

@@ -11,9 +11,10 @@ qic(x, y = NULL, n = NULL, data = NULL, facets = NULL, notes = NULL,
   * 1, nrow = NULL, ncol = NULL, scales = "fixed", title = "",
   ylab = "Value", xlab = "Subgroup", subtitle = NULL, caption = NULL,
   part.labels = NULL, show.labels = is.null(facets), decimals = 1,
-  point.size = 1, x.format = NULL, x.angle = NULL, x.pad = 1,
-  y.expand = NULL, y.neg = TRUE, y.percent = FALSE, show.grid = FALSE,
-  flip = FALSE, strip.horizontal = FALSE, print.summary = FALSE)
+  point.size = 1, x.period = NULL, x.format = NULL, x.angle = NULL,
+  x.pad = 1, y.expand = NULL, y.neg = TRUE, y.percent = FALSE,
+  show.grid = FALSE, flip = FALSE, strip.horizontal = FALSE,
+  print.summary = FALSE)
 }
 \arguments{
 \item{x}{Vector of subgroup values to plot along the x axis.}
@@ -49,11 +50,11 @@ recalculation of centre and control lines.}
 \item{exclude}{Integer vector indicating data points to exclude from 
 calculations of centre and control lines.}
 
-\item{target}{Numeric value indicating a target value to be plotted as a 
-horizontal line (same for each facet).}
+\item{target}{Numeric, either a single value indicating a target value to be plotted as a 
+horizontal line or a vector for variable target line.}
 
-\item{cl}{Numeric, either a value indicating the centre line if known in 
-advance or a vector if centre line is variable.}
+\item{cl}{Numeric, either a single value indicating the centre line if known in 
+advance or a vector for variable centre line.}
 
 \item{nrow, ncol}{Number indicating the preferred number of rows and columns 
 in facets.}
@@ -82,6 +83,10 @@ control lines on chart. Defaults to TRUE when facets argument is NULL.}
 and control line labels.}
 
 \item{point.size}{Number specifying the size of data points.}
+
+\item{x.period}{Character string specifying the interval cut points of 
+datetime x values used for aggregating y values by week, month, etc.
+See the breaks argument of \code{?cut.POSIXt()} for possible values.}
 
 \item{x.format}{Date format of x axis labels. See \code{?strftime()} for 
 possible date formats.}
