@@ -263,6 +263,7 @@ qic.g <- function(x){
   base <- x$baseline & x$include
   
   # Calculate centre line
+  calccl <- anyNA(x$cl)
   if (anyNA(x$cl)) {
     x$cl <- mean(x$y[base], na.rm = TRUE)
   }
@@ -280,14 +281,19 @@ qic.g <- function(x){
   # x$cl <- 0.693 * x$cl
   
   # Set centre line to median
-  x$cl <- stats::median(x$y, na.rm = TRUE)
+  if(calccl) {
+    x$cl <- stats::median(x$y[base], na.rm = TRUE)
+  } else {
+    x$cl <- 0.693 * x$cl
+  }
   
   return(x)
 }
 
 c4 <- function(n) {
   n[n <= 1] <- NA
-  sqrt(2 / (n - 1)) * gamma(n / 2) / gamma((n - 1) / 2)
+  # sqrt(2 / (n - 1)) * gamma(n / 2) / gamma((n - 1) / 2)
+  sqrt(2 / (n - 1)) * exp(lgamma(n / 2) - lgamma((n - 1) / 2))
 }
 
 c5 <- function(n) {
@@ -443,13 +449,14 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
         target.lab <- ifelse(xx == max(xx), target, NA)
       })
     })
-  
   d <- do.call(rbind, d) %>% 
     arrange(!!facet1, !!facet2, !!x)
   
   # Remove control lines from missing subgroups
   d$ucl[!is.finite(d$ucl)] <- NA
   d$lcl[!is.finite(d$lcl)] <- NA
+  d$lcl.lab[!is.finite(d$lcl.lab)] <- NA
+  d$ucl.lab[!is.finite(d$ucl.lab)] <- NA
   
   # Add sigma signals
   d$sigma.signal                        <- d$y > d$ucl | d$y < d$lcl
