@@ -4,18 +4,45 @@
 \alias{qic}
 \title{Statistical process control charts.}
 \usage{
-qic(x, y = NULL, n = NULL, data = NULL, facets = NULL,
-  notes = NULL, chart = c("run", "i", "mr", "xbar", "s", "t", "p",
-  "pp", "c", "u", "up", "g"), agg.fun = c("mean", "median", "sum", "sd"),
-  multiply = 1, freeze = NULL, part = NULL, exclude = NULL,
-  target = NA * 1, cl = NA * 1, nrow = NULL, ncol = NULL,
-  scales = "fixed", title = "", ylab = "Value", xlab = "Subgroup",
-  subtitle = NULL, caption = NULL, part.labels = NULL,
-  show.labels = is.null(facets), decimals = 1, point.size = 1,
-  x.period = NULL, x.format = NULL, x.angle = NULL, x.pad = 1,
-  y.expand = NULL, y.neg = TRUE, y.percent = FALSE,
-  show.grid = FALSE, flip = FALSE, strip.horizontal = FALSE,
-  print.summary = FALSE)
+qic(
+  x,
+  y = NULL,
+  n = NULL,
+  data = NULL,
+  facets = NULL,
+  notes = NULL,
+  chart = c("run", "i", "mr", "xbar", "s", "t", "p", "pp", "c", "u", "up", "g"),
+  agg.fun = c("mean", "median", "sum", "sd"),
+  multiply = 1,
+  freeze = NULL,
+  part = NULL,
+  exclude = NULL,
+  target = NA * 1,
+  cl = NA * 1,
+  nrow = NULL,
+  ncol = NULL,
+  scales = "fixed",
+  title = "",
+  ylab = "Value",
+  xlab = "Subgroup",
+  subtitle = NULL,
+  caption = NULL,
+  part.labels = NULL,
+  show.labels = is.null(facets),
+  decimals = 1,
+  point.size = 1,
+  x.period = NULL,
+  x.format = NULL,
+  x.angle = NULL,
+  x.pad = 1,
+  y.expand = NULL,
+  y.neg = TRUE,
+  y.percent = FALSE,
+  show.grid = FALSE,
+  flip = FALSE,
+  strip.horizontal = FALSE,
+  print.summary = FALSE
+)
 }
 \arguments{
 \item{x}{Vector of subgroup values to plot along the x axis.}
@@ -45,8 +72,8 @@ for percents rather than proportions. See also \code{y.percent} argument.}
 calculation of baseline paramenters for centre and control lines. Ignored 
 if part argument is given.}
 
-\item{part}{Integer vector indicating data points before 
-recalculation of centre and control lines.}
+\item{part}{Either integer vector indicating data points before recalculation
+of centre and control lines or character vector indicating chart parts.}
 
 \item{exclude}{Integer vector indicating data points to exclude from 
 calculations of centre and control lines.}
