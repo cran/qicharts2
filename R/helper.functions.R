@@ -1,5 +1,5 @@
 # #' @import dplyr
-runs.analysis <- function(x) {
+runs.analysis <- function(x, method) {
   y                  <- x$y[x$include]
   cl                 <- x$cl[x$include]
   runs               <- sign(y - cl)
@@ -17,6 +17,10 @@ runs.analysis <- function(x) {
                                       max(n.useful - 1, 0), 0.5)
     runs.signal      <- longest.run > longest.run.max ||
       n.crossings < n.crossings.min
+    runs.signal <- crsignal(n.useful,
+                            n.crossings,
+                            longest.run,
+                            method = method)
   } else {
     longest.run      <- NA
     longest.run.max  <- NA
@@ -24,7 +28,7 @@ runs.analysis <- function(x) {
     n.crossings.min  <- NA
     runs.signal      <- FALSE
   }
-  
+
   x$n.obs           <- n.obs
   x$n.useful        <- n.useful
   x$runs.signal     <- runs.signal
@@ -34,6 +38,91 @@ runs.analysis <- function(x) {
   x$n.crossings.min <- n.crossings.min
   
   return(x)
+}
+
+crsignal <- function(n, c, l, method = c('anhoej', 'bestbox', 'cutbox')) {
+  method <- match.arg(method)
+  
+  if (!(method %in% c('anhoej', 'bestbox', 'cutbox')))
+    stop('method should be \"anhoej\", \"bestbox\", or \"cutbox\"')
+  
+  if ((n < 10 | n > 100) & method != 'anhoej') {
+    message('Best box and cut box computations only available for n between ',
+            '10 and 100. Using method = "anhoej"')
+    method <- 'anhoej'
+  }
+  
+  if(method != 'anhoej')
+    message('Runs analysis using ', method, ' method')
+  
+  if (!(c %in% c(0:n - 1)))
+    stop('c should be an integer between 0 and ', n - 1)
+  
+  if (!(l %in% c(1:n)))
+    stop('l should be an integer between 1 and ', n)
+  
+  bounds <- data.frame(
+    n = 10:100,
+    cb    = c(  2,  3,  3,  3,  3,  4,  5,  5,  5,  5,  6,  7,  6,
+                6,  6,  6,  9,  9,  9, 10, 11, 11, 11, 11, 11, 12,
+               13, 14, 13, 15, 15, 15, 14, 14, 17, 17, 17, 17, 19,
+               19, 19, 19, 19, 21, 21, 21, 21, 23, 23, 23, 23, 23,
+               25, 25, 26, 26, 27, 27, 27, 28, 29, 29, 29, 30, 30,
+               31, 31, 31, 32, 33, 33, 33, 34, 33, 35, 35, 35, 35, 
+               37, 37, 38, 37, 39, 39, 39, 39, 39, 41, 41, 42, 41),
+    lb    = c(  6,  7,  6,  6,  6,  7,  8,  7,  7,  7,  7,  8,  7,
+                7,  7,  7,  9,  8,  8,  8, 10,  9,  8,  8,  8,  8,
+                9, 10,  8, 11,  9,  9,  8,  8, 10,  9,  9,  9, 12,
+               10,  9,  9,  9, 11, 10,  9,  9, 12, 10, 10,  9,  9,
+               11, 10, 11, 10, 12, 10, 10, 11, 14, 11, 10, 11, 10,
+               12, 11, 10, 11, 13, 11, 10, 11, 10, 11, 11, 10, 10, 
+               12, 11, 12, 10, 13, 11, 11, 10, 10, 12, 11, 12, 10), 
+    cbord = c(  3,  4, NA, NA, NA,  6,  6, NA,  6,  6, NA, NA,  7,
+                7,  7, NA, 10, 10, 11, NA, 12, 14, NA, 12, 13, NA, 
+               15, NA, NA, NA, NA, 17, NA, NA, NA, NA, 19, 20, 20, 
+               21, NA, 21, 21, 23, 23, NA, 23, 25, 24, 26, NA, 24,
+               27, 27, 27, 27, 29, NA, 29, 29, 30, 31, 30, 31, NA, 
+               32, 34, 33, 33, 37, 35, NA, 36, 36, NA, 38, 36, 38, 
+               38, 39, NA, 39, 41, 40, 42, NA, 41, 42, 44, 43, 42),
+    lbord = c(  5,  6, NA, NA, NA,  6,  7, NA,  6,  5, NA, NA,  6,
+                6,  6, NA,  7,  7,  7, NA,  9,  8, NA,  7,  7, NA,
+                8, NA, NA, NA, NA,  8, NA, NA, NA, NA,  8,  7, 11, 
+                9, NA,  8,  7,  9,  8, NA,  8, 11,  9,  8, NA,  8,
+                9,  9, 10,  9, 10, NA,  8,  8, 13,  9,  9, 10, NA,
+                9,  8,  9,  8, 11,  9, NA, 10,  7, NA,  8,  9,  8,
+               10,  9, NA,  9, 12, 10,  8, NA,  8,  9,  9, 10,  9))
+  
+  res <- FALSE
+  
+  if (method == 'anhoej') {
+    can <- stats::qbinom(0.05, n - 1, 0.5)
+    lan <- round(log2(n)) + 3
+    if (!(c >= can & l <= lan))
+      res <- TRUE
+  } else if (method == 'bestbox') {
+    cbn <- bounds$cb[bounds$n == n]
+    lbn <- bounds$lb[bounds$n == n]
+    if (!(c >= cbn & l <= lbn))
+      res <- TRUE
+  } else if (method == 'cutbox') {
+    cbn    <- bounds$cb[bounds$n == n]
+    lbn    <- bounds$lb[bounds$n == n]
+    cbordn <- bounds$cbord[bounds$n == n]
+    lbordn <- bounds$lbord[bounds$n == n]
+    if (is.na(cbordn) & !(c >= cbn & l <= lbn))
+      res <- TRUE
+    else if (!is.na(cbordn)) {
+      res <- TRUE
+      if (c >= cbn + 1 & l <= lbn - 1)
+        res <- FALSE
+      if (c == cbn & l <= lbordn)
+        res <- FALSE
+      if (c >= cbordn & l <= lbn)
+        res <- FALSE
+    }
+  }
+  
+  return(res)
 }
 
 qic.run <- function(x) {
@@ -121,9 +210,8 @@ qic.s <- function(x){
     if (var.n) { # Variable subgroup size: Montgomery 6.31
       x$cl <- sqrt(sum((x$y.length[base] - 1) * x$y.sd[base]^2, na.rm = TRUE) /
                      sum(x$y.length[base] - 1, na.rm = TRUE))
-      # x$cl <- sum(x$y[base] * x$y.length[base]) / sum(x$y.length[base])
     } else { # Constant subgroup size: Montgomery 6.29
-      x$cl <- mean(x$y.sd, na.rm = TRUE)
+      x$cl <- mean(x$y.sd[base], na.rm = TRUE)
     }
   }
   B3     <- b3(x$y.length)
@@ -340,85 +428,9 @@ fixnotes <- function(x) {
   x <- gsub("^$", NA, x)
 }
 
-# # Function for data aggregation and analysis (needs dplyr, deprecated)
-# qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude, 
-#                     chart.fun, multiply, dots.only, chart, y.neg) {
-#   x      <- quo(x)
-#   y      <- quo(y)
-#   n      <- quo(n)
-#   cl     <- quo(cl)
-#   target <- quo(target)
-#   notes  <- quo(notes)
-#   facet1 <- quo(facet1)
-#   facet2 <- quo(facet2)
-#   
-#   d <- d %>% 
-#     filter(!is.na(!!x)) %>% 
-#     group_by(!!x, !!facet1, !!facet2) %>% 
-#     summarise(y.sum    = sum(!!y, na.rm = TRUE),
-#               y.length = sum(!is.na(!!y)),
-#               y.mean   = mean(!!y, na.rm = TRUE),
-#               y.sd     = stats::sd(!!y, na.rm = TRUE),
-#               n        = sum(!!n, na.rm = got.n),
-#               y        = ifelse(got.n,
-#                                 y.sum / n,
-#                                 do.call(agg.fun, list(y, na.rm = TRUE))),
-#               cl       = first(!!cl),
-#               target   = first(!!target),
-#               notes    = paste(!!notes, collapse = '|')
-#     ) %>% 
-#     group_by(facet1, facet2) %>%
-#     mutate(part = makeparts(part, n()),
-#            xx   = seq_along(part)) %>% 
-#     ungroup() %>% 
-#     mutate(baseline = xx <= freeze,
-#            include  = !xx %in% exclude,
-#            notes    = fixnotes(notes))
-#   
-#   d <- split(d, d[c('facet1', 'facet2', 'part')]) %>% 
-#     lapply(chart.fun) %>% 
-#     lapply(runs.analysis) %>% 
-#     lapply(function(x) {
-#       within(x, {
-#         y          <- y * multiply
-#         cl         <- cl * multiply
-#         lcl        <- lcl * multiply
-#         ucl        <- ucl * multiply
-#         cl.lab     <- ifelse(xx == max(xx), cl, NA)
-#         lcl.lab    <- ifelse(xx == max(xx), lcl, NA)
-#         ucl.lab    <- ifelse(xx == max(xx), ucl, NA)
-#         target.lab <- ifelse(xx == max(xx), target, NA)
-#       })
-#     })
-#   d <- do.call(rbind, d) %>% 
-#     arrange(!!facet1, !!facet2, !!x)
-#   
-#   # Remove control lines from missing subgroups
-#   d$ucl[!is.finite(d$ucl)] <- NA
-#   d$lcl[!is.finite(d$lcl)] <- NA
-#   d$lcl.lab[!is.finite(d$lcl.lab)] <- NA
-#   d$ucl.lab[!is.finite(d$ucl.lab)] <- NA
-#   
-#   # Add sigma signals
-#   d$sigma.signal                        <- d$y > d$ucl | d$y < d$lcl
-#   d$sigma.signal[is.na(d$sigma.signal)] <- FALSE
-#   
-#   # Ignore runs analysis if subgroups are categorical or if chart type is MR
-#   if (dots.only || chart == 'mr')
-#     d$runs.signal <- FALSE
-#   
-#   # Prevent negative y axis if y.neg argument is FALSE
-#   if (!y.neg & min(d$y, na.rm = TRUE) >= 0) {
-#     d$lcl[d$lcl < 0]         <- 0
-#     d$lcl.lab[d$lcl.lab < 0] <- 0
-#   }
-#   
-#   return(d)
-# }
-
 # Function for data aggregation and analysis
 qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude, 
-                    chart.fun, multiply, dots.only, chart, y.neg) {
+                    chart.fun, multiply, dots.only, chart, method, y.neg) {
   d <- d[!is.na(d$x), ]
   d <- split(d, d[,c('x', 'facet1', 'facet2')])
   d <- lapply(d, function(x) {
@@ -436,7 +448,7 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
                                  do.call(agg.fun, list(x$y, na.rm = TRUE))),
                cl       = x$cl[1],
                target   = x$target[1],
-               notes    = paste(x$notes, collapse = '|'))
+               notes    = paste(unique(x$notes), collapse = '|'))
   })
   
   d <- do.call(rbind, d)
@@ -456,7 +468,7 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
   
   d <- split(d, d[c('facet1', 'facet2', 'part')])
   d <- lapply(d, chart.fun)
-  d <- lapply(d, runs.analysis)
+  d <- lapply(d, runs.analysis, method)
   d <- lapply(d, function(x) {
     x$y          <- x$y * multiply
     x$cl         <- x$cl * multiply
