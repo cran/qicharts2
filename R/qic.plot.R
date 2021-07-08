@@ -3,7 +3,7 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
                      nrow, ncol, scales, show.labels, show.grid, 
                      decimals, flip, dots.only, point.size,
                      x.format, x.angle, x.pad,
-                     y.expand, y.percent, strip.horizontal,
+                     y.expand, y.percent, y.percent.accuracy, strip.horizontal,
                      col.line = '#5DA5DA', 
                      col.signal = '#F15854', 
                      col.target = '#059748',
@@ -23,11 +23,6 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   x$dotcol  <- ifelse(x$y == x$cl, 'col5', 'col2')
   x$dotcol  <- ifelse(x$sigma.signal, 'col3', x$dotcol)
   x$dotcol  <- ifelse(x$include, x$dotcol, 'col5')
-  
-  # x$dotcol  <- ifelse(x$sigma.signal, 'col3', 'col2')
-  # x$dotcol  <- ifelse(x$include, x$dotcol, 'col5')
-  # x$dotcol  <- ifelse(x$y == x$cl, 'col5', x$dotcol)
-  
   x$linecol <- ifelse(x$runs.signal, 'col3', 'col1')
 
   # Set label parameters
@@ -211,14 +206,19 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   
   # Format percent axis
   if (y.percent) {
-    p <- p + scale_y_continuous(labels = scales::percent)
+    p <- p + scale_y_continuous(labels = scales::percent_format(y.percent.accuracy))
   }
   
   # Add space for line labels
   subgroups <- unique(x$x)
   
-  if (is.factor(subgroups))
-    subgroups <- as.numeric(subgroups)
+  # TESTING ##########################
+  # if (is.factor(subgroups))
+  #   subgroups <- as.numeric(subgroups)
+  
+  if(is.character(subgroups) || is.factor(subgroups))
+    subgroups <- seq_along(subgroups)
+  # TESTING ##########################
   
   p <- p +
     expand_limits(x = max((subgroups)) +
@@ -226,7 +226,8 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   
   # Show grid
   if (show.grid) {
-    p <- p + theme(panel.grid = element_line())
+    p <- p + theme(panel.grid = element_line(size = 0.1, colour = col1))
+    # p <- p + theme(panel.grid = element_line())
   }
   
   # Flip chart

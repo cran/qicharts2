@@ -31,7 +31,7 @@ qic(
   part.labels = NULL,
   show.labels = is.null(facets),
   decimals = 1,
-  point.size = 1,
+  point.size = 1.2,
   x.period = NULL,
   x.format = NULL,
   x.angle = NULL,
@@ -39,10 +39,12 @@ qic(
   y.expand = NULL,
   y.neg = TRUE,
   y.percent = FALSE,
+  y.percent.accuracy = NULL,
   show.grid = FALSE,
   flip = FALSE,
   strip.horizontal = FALSE,
-  print.summary = FALSE
+  print.summary = FALSE,
+  return.data = FALSE
 )
 }
 \arguments{
@@ -136,6 +138,9 @@ relevant for I and Xbar charts).}
 
 \item{y.percent}{If TRUE, formats y axis labels as percentages.}
 
+\item{y.percent.accuracy}{A number to round percentage labels on y axis. Use
+1 to show no decimals, 0.1 to show 1 decimal etc.}
+
 \item{show.grid}{If TRUE, shows grid.}
 
 \item{flip}{If TRUE, rotates the plot 90 degrees.}
@@ -143,6 +148,8 @@ relevant for I and Xbar charts).}
 \item{strip.horizontal}{If TRUE, makes y strip horizontal.}
 
 \item{print.summary}{If TRUE, prints summary.}
+
+\item{return.data}{If TRUE, returns underlying data frame.}
 }
 \value{
 A \code{qic} object. Inherits from 'ggplot'.
@@ -157,10 +164,11 @@ Non-random variation in the form of minor to moderate persistent shifts in
 data over time is (by default) identified by the Anhoej rules for unusually
 long runs and unusually few crossing. Use the EXPERIMENTAL method argument to
 apply the bestbox or cutbox methods as described in Anhøj & Wentzel-Larsen
-(2020) \url{https://doi.org/10.1371/journal.pone.0233920}.
+(2020) \doi{10.1371/journal.pone.0233920}.
 
-Special cause variation in the form of larger, possibly
-transient, shifts in data is identified by Shewhart's 3-sigma rule.
+Special cause variation in the form of larger, possibly transient, shifts in
+data is identified by Shewhart's 3-sigma rule (Mohammed, Worthington,
+Woodall (2008) \doi{10.1136/qshc.2004.012047}).
 }
 \examples{
 # Lock random number generator to make reproducible results.
@@ -183,7 +191,7 @@ qic(month, n,
     facets   = infection ~ hospital,
     chart    = 'u',
     multiply = 10000,
-    title     = 'Hospital infection rates',
+    title    = 'Hospital infection rates',
     ylab     = 'Number of infections per 10.000 risk days',
     xlab     = 'Month')
 

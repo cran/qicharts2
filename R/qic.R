@@ -8,10 +8,11 @@
 #' data over time is (by default) identified by the Anhoej rules for unusually
 #' long runs and unusually few crossing. Use the EXPERIMENTAL method argument to
 #' apply the bestbox or cutbox methods as described in Anhøj & Wentzel-Larsen
-#' (2020) \url{https://doi.org/10.1371/journal.pone.0233920}.
-#' 
-#' Special cause variation in the form of larger, possibly
-#' transient, shifts in data is identified by Shewhart's 3-sigma rule.
+#' (2020) \doi{10.1371/journal.pone.0233920}.
+#'
+#' Special cause variation in the form of larger, possibly transient, shifts in
+#' data is identified by Shewhart's 3-sigma rule (Mohammed, Worthington,
+#' Woodall (2008) \doi{10.1136/qshc.2004.012047}).
 #'
 #' @param x Vector of subgroup values to plot along the x axis.
 #' @param y Vector of measures or counts to plot on the y axis (numerator).
@@ -70,10 +71,13 @@
 #' @param y.neg If TRUE (default), the y axis is allowed to be negative (only
 #'   relevant for I and Xbar charts).
 #' @param y.percent If TRUE, formats y axis labels as percentages.
+#' @param y.percent.accuracy A number to round percentage labels on y axis. Use
+#'   1 to show no decimals, 0.1 to show 1 decimal etc.
 #' @param show.grid If TRUE, shows grid.
 #' @param flip If TRUE, rotates the plot 90 degrees.
 #' @param strip.horizontal If TRUE, makes y strip horizontal.
 #' @param print.summary If TRUE, prints summary.
+#' @param return.data If TRUE, returns underlying data frame.
 # @param ... Additional arguments to plot function.
 #'
 #' @return A \code{qic} object. Inherits from 'ggplot'.
@@ -101,7 +105,7 @@
 #'     facets   = infection ~ hospital,
 #'     chart    = 'u',
 #'     multiply = 10000,
-#'     title     = 'Hospital infection rates',
+#'     title    = 'Hospital infection rates',
 #'     ylab     = 'Number of infections per 10.000 risk days',
 #'     xlab     = 'Month')
 #'
@@ -109,44 +113,46 @@
 #' @export
 
 qic <- function(x,
-                y                = NULL,
-                n                = NULL,
-                data             = NULL,
-                facets           = NULL,
-                notes            = NULL,
-                chart            = c('run', 'i', 'mr', 'xbar', 's', 't',
-                                     'p', 'pp', 'c', 'u', 'up', 'g'),
-                agg.fun          = c('mean', 'median', 'sum', 'sd'),
-                method           = c('anhoej', 'bestbox', 'cutbox'),
-                multiply         = 1,
-                freeze           = NULL,
-                part             = NULL,
-                exclude          = NULL,
-                target           = NA * 1,
-                cl               = NA * 1, #NULL,
-                nrow             = NULL,
-                ncol             = NULL,
-                scales           = 'fixed',
-                title            = '',
-                ylab             = 'Value',
-                xlab             = 'Subgroup',
-                subtitle         = NULL,
-                caption          = NULL,
-                part.labels      = NULL,
-                show.labels      = is.null(facets),
-                decimals         = 1,
-                point.size       = 1,
-                x.period         = NULL,
-                x.format         = NULL,
-                x.angle          = NULL,
-                x.pad            = 1,
-                y.expand         = NULL,
-                y.neg            = TRUE,
-                y.percent        = FALSE,
-                show.grid        = FALSE,
-                flip             = FALSE,
-                strip.horizontal = FALSE,
-                print.summary    = FALSE) {
+                y                  = NULL,
+                n                  = NULL,
+                data               = NULL,
+                facets             = NULL,
+                notes              = NULL,
+                chart              = c('run', 'i', 'mr', 'xbar', 's', 't',
+                                       'p', 'pp', 'c', 'u', 'up', 'g'),
+                agg.fun            = c('mean', 'median', 'sum', 'sd'),
+                method             = c('anhoej', 'bestbox', 'cutbox'),
+                multiply           = 1,
+                freeze             = NULL,
+                part               = NULL,
+                exclude            = NULL,
+                target             = NA * 1,
+                cl                 = NA * 1, #NULL,
+                nrow               = NULL,
+                ncol               = NULL,
+                scales             = 'fixed',
+                title              = '',
+                ylab               = 'Value',
+                xlab               = 'Subgroup',
+                subtitle           = NULL,
+                caption            = NULL,
+                part.labels        = NULL,
+                show.labels        = is.null(facets),
+                decimals           = 1,
+                point.size         = 1.2,
+                x.period           = NULL,
+                x.format           = NULL,
+                x.angle            = NULL,
+                x.pad              = 1,
+                y.expand           = NULL,
+                y.neg              = TRUE,
+                y.percent          = FALSE,
+                y.percent.accuracy = NULL,
+                show.grid          = FALSE,
+                flip               = FALSE,
+                strip.horizontal   = FALSE,
+                print.summary      = FALSE,
+                return.data        = FALSE) {
   
   # Check data
   if (missing(x))
@@ -225,8 +231,8 @@ qic <- function(x,
     } else {
       part <- as.integer(part)
     }
-  }
 
+  }
   if (is.null(exclude)) 
     exclude <- Inf
   
@@ -238,7 +244,7 @@ qic <- function(x,
   
   # Only connect data points and perform runs analysis if x is numeric
   dots.only <- is.factor(x) || mode(x) != 'numeric'
-  
+
   # Convert dates and datetimes to POSIXct
   if (inherits(x, c('Date', 'POSIXt'))) {
     x <- as.POSIXct(as.character(x), tz = 'UTC')
@@ -263,6 +269,11 @@ qic <- function(x,
   d <- qic.agg(d, got.n, part, agg.fun, freeze, exclude, 
                chart.fun, multiply, dots.only, chart, method, y.neg)
 
+  # Return data to user if requested
+  if (return.data) {
+    return(d)
+  }
+  
   # Format y for p charts
   if (missing(y.percent) & chart %in% c('p', 'pp')) {
     y.percent <- TRUE
@@ -274,27 +285,28 @@ qic <- function(x,
   
   # Build plot
   p <- plot.qic(d, 
-                title            = title, 
-                xlab             = xlab, 
-                ylab             = ylab,
-                subtitle         = subtitle, 
-                caption          = caption, 
-                part.labels      = part.labels, 
-                nrow             = nrow, 
-                ncol             = ncol, 
-                scales           = scales,
-                show.labels      = show.labels,
-                show.grid        = show.grid,
-                decimals         = decimals,
-                flip             = flip,
-                dots.only        = dots.only,
-                point.size       = point.size,
-                x.format         = x.format,
-                x.angle          = x.angle,
-                x.pad            = x.pad,
-                y.expand         = y.expand,
-                y.percent        = y.percent,
-                strip.horizontal = strip.horizontal)
+                title              = title, 
+                xlab               = xlab, 
+                ylab               = ylab,
+                subtitle           = subtitle, 
+                caption            = caption, 
+                part.labels        = part.labels, 
+                nrow               = nrow, 
+                ncol               = ncol, 
+                scales             = scales,
+                show.labels        = show.labels,
+                show.grid          = show.grid,
+                decimals           = decimals,
+                flip               = flip,
+                dots.only          = dots.only,
+                point.size         = point.size,
+                x.format           = x.format,
+                x.angle            = x.angle,
+                x.pad              = x.pad,
+                y.expand           = y.expand,
+                y.percent          = y.percent,
+                y.percent.accuracy = y.percent.accuracy,
+                strip.horizontal   = strip.horizontal)
   
   class(p) <- c('qic', class(p))
   

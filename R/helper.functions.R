@@ -1,4 +1,3 @@
-# #' @import dplyr
 runs.analysis <- function(x, method) {
   y                  <- x$y[x$include]
   cl                 <- x$cl[x$include]
@@ -275,7 +274,13 @@ qic.pp <- function(x) {
   # Calculate standard deviation for Laney's P prime chart, incorporating
   # between-subgroup variation.
   z_i     <- (x$y[base] - x$cl[base]) / stdev[base]
-  sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
+# TESTING ##############################################
+  if(is.factor(x$x) || is.character(x$x))
+    sigma_z <- stats::sd(z_i)
+  else
+    sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
+# TESTING ##############################################  
+  
   stdev   <- stdev * sigma_z
   
   x$ucl          <- x$cl + 3 * stdev
@@ -336,7 +341,15 @@ qic.up <- function(x){
   # Calculate standard deviation for Laney's u-prime chart, incorporating
   # between-subgroup variation.
   z_i     <- (x$y[base] - x$cl[base]) / stdev[base]
-  sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
+  
+  # TESTING ##############################################
+  # sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
+  if(is.factor(x$x) || is.character(x$x))
+    sigma_z <- stats::sd(z_i)
+  else
+    sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
+  # TESTING ##############################################  
+  
   stdev   <- stdev * sigma_z
   
   # Calculate limits
@@ -409,7 +422,7 @@ lab.format <- function(x, decimals = 1, percent = FALSE) {
   x <- sprintf(paste0("%.", decimals, "f"), x)
   if (percent) x <- paste0(x, '%')
   
-  x
+  return(x)
 }
 
 # Make parts function
@@ -418,6 +431,8 @@ makeparts <- function(x, n) {
   x <- x[x >= 0 & x < n]
   x <- x[order(x)]
   x <- rep(c(seq_along(x)), diff(c(x, n)))
+  
+  return(x)
 }
 
 # Fix notes function
@@ -426,6 +441,8 @@ fixnotes <- function(x) {
   x <- gsub("^\\||\\|$", "", x)
   x <- gsub("\\|", " | ", x)
   x <- gsub("^$", NA, x)
+  
+  return(x)
 }
 
 # Function for data aggregation and analysis
@@ -514,7 +531,7 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
 }
 
 .onDetach <- function(libpath) {
-  options(qic.linecol = NULL,
+  options(qic.linecol   = NULL,
           qic.signalcol = NULL,
           qic.targetcol = NULL,
           qic.clshade   = NULL)
