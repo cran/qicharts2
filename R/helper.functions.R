@@ -64,32 +64,32 @@ crsignal <- function(n, c, l, method = c('anhoej', 'bestbox', 'cutbox')) {
     n = 10:100,
     cb    = c(  2,  3,  3,  3,  3,  4,  5,  5,  5,  5,  6,  7,  6,
                 6,  6,  6,  9,  9,  9, 10, 11, 11, 11, 11, 11, 12,
-               13, 14, 13, 15, 15, 15, 14, 14, 17, 17, 17, 17, 19,
-               19, 19, 19, 19, 21, 21, 21, 21, 23, 23, 23, 23, 23,
-               25, 25, 26, 26, 27, 27, 27, 28, 29, 29, 29, 30, 30,
-               31, 31, 31, 32, 33, 33, 33, 34, 33, 35, 35, 35, 35, 
-               37, 37, 38, 37, 39, 39, 39, 39, 39, 41, 41, 42, 41),
+                13, 14, 13, 15, 15, 15, 14, 14, 17, 17, 17, 17, 19,
+                19, 19, 19, 19, 21, 21, 21, 21, 23, 23, 23, 23, 23,
+                25, 25, 26, 26, 27, 27, 27, 28, 29, 29, 29, 30, 30,
+                31, 31, 31, 32, 33, 33, 33, 34, 33, 35, 35, 35, 35, 
+                37, 37, 38, 37, 39, 39, 39, 39, 39, 41, 41, 42, 41),
     lb    = c(  6,  7,  6,  6,  6,  7,  8,  7,  7,  7,  7,  8,  7,
                 7,  7,  7,  9,  8,  8,  8, 10,  9,  8,  8,  8,  8,
                 9, 10,  8, 11,  9,  9,  8,  8, 10,  9,  9,  9, 12,
-               10,  9,  9,  9, 11, 10,  9,  9, 12, 10, 10,  9,  9,
-               11, 10, 11, 10, 12, 10, 10, 11, 14, 11, 10, 11, 10,
-               12, 11, 10, 11, 13, 11, 10, 11, 10, 11, 11, 10, 10, 
-               12, 11, 12, 10, 13, 11, 11, 10, 10, 12, 11, 12, 10), 
+                10,  9,  9,  9, 11, 10,  9,  9, 12, 10, 10,  9,  9,
+                11, 10, 11, 10, 12, 10, 10, 11, 14, 11, 10, 11, 10,
+                12, 11, 10, 11, 13, 11, 10, 11, 10, 11, 11, 10, 10, 
+                12, 11, 12, 10, 13, 11, 11, 10, 10, 12, 11, 12, 10), 
     cbord = c(  3,  4, NA, NA, NA,  6,  6, NA,  6,  6, NA, NA,  7,
                 7,  7, NA, 10, 10, 11, NA, 12, 14, NA, 12, 13, NA, 
-               15, NA, NA, NA, NA, 17, NA, NA, NA, NA, 19, 20, 20, 
-               21, NA, 21, 21, 23, 23, NA, 23, 25, 24, 26, NA, 24,
-               27, 27, 27, 27, 29, NA, 29, 29, 30, 31, 30, 31, NA, 
-               32, 34, 33, 33, 37, 35, NA, 36, 36, NA, 38, 36, 38, 
-               38, 39, NA, 39, 41, 40, 42, NA, 41, 42, 44, 43, 42),
+                15, NA, NA, NA, NA, 17, NA, NA, NA, NA, 19, 20, 20, 
+                21, NA, 21, 21, 23, 23, NA, 23, 25, 24, 26, NA, 24,
+                27, 27, 27, 27, 29, NA, 29, 29, 30, 31, 30, 31, NA, 
+                32, 34, 33, 33, 37, 35, NA, 36, 36, NA, 38, 36, 38, 
+                38, 39, NA, 39, 41, 40, 42, NA, 41, 42, 44, 43, 42),
     lbord = c(  5,  6, NA, NA, NA,  6,  7, NA,  6,  5, NA, NA,  6,
                 6,  6, NA,  7,  7,  7, NA,  9,  8, NA,  7,  7, NA,
                 8, NA, NA, NA, NA,  8, NA, NA, NA, NA,  8,  7, 11, 
                 9, NA,  8,  7,  9,  8, NA,  8, 11,  9,  8, NA,  8,
                 9,  9, 10,  9, 10, NA,  8,  8, 13,  9,  9, 10, NA,
                 9,  8,  9,  8, 11,  9, NA, 10,  7, NA,  8,  9,  8,
-               10,  9, NA,  9, 12, 10,  8, NA,  8,  9,  9, 10,  9))
+                10,  9, NA,  9, 12, 10,  8, NA,  8,  9,  9, 10,  9))
   
   res <- FALSE
   
@@ -129,7 +129,9 @@ qic.run <- function(x) {
   if (anyNA(x$cl))
     x$cl  <- stats::median(x$y[base], na.rm = TRUE)
   x$ucl <- as.numeric(NA)
+  x$ucl.95 <- as.numeric(NA)
   x$lcl <- as.numeric(NA)
+  x$lcl.95 <- as.numeric(NA)
   
   return(x)
 }
@@ -155,7 +157,9 @@ qic.i <- function(x) {
   
   # Calculate control limits
   x$lcl <- x$cl - 3 * stdev
+  x$lcl.95 <- x$cl - 2 * stdev
   x$ucl <- x$cl + 3 * stdev
+  x$ucl.95 <- x$cl + 2 * stdev
   
   return(x)
 }
@@ -170,7 +174,9 @@ qic.mr <- function(x) {
   
   # Calculate upper limit for moving ranges
   x$lcl <- 0
+  x$lcl.95 <- 0
   x$ucl <- 3.267 * x$cl
+  x$ucl.95 <- (3.267 / 3) * 2 * x$cl
   
   return(x)
 }
@@ -193,8 +199,11 @@ qic.xbar <- function(x){
     stdev <- mean(x$y.sd[base], na.rm = TRUE)
   }
   A3    <- a3(x$y.length)
+  A3.95 <- a3(x$y.length, use.95=TRUE)
   x$ucl <- x$cl + A3 * stdev
+  x$ucl.95 <- x$cl + A3.95 * stdev
   x$lcl <- x$cl - A3 * stdev
+  x$lcl.95 <- x$cl - A3.95 * stdev
   
   return(x)
 }
@@ -213,10 +222,14 @@ qic.s <- function(x){
       x$cl <- mean(x$y.sd[base], na.rm = TRUE)
     }
   }
-  B3     <- b3(x$y.length)
-  B4     <- b4(x$y.length)
-  x$ucl  <- B4 * x$cl
-  x$lcl  <- B3 * x$cl
+  B3        <- b3(x$y.length)
+  B3.95     <- b3(x$y.length, use.95=TRUE)
+  B4        <- b4(x$y.length)
+  B4.95     <- b4(x$y.length, use.95=TRUE)
+  x$ucl     <- B4 * x$cl
+  x$ucl.95  <- B4.95 * x$cl
+  x$lcl     <- B3 * x$cl
+  x$lcl.95  <- B3.95 * x$cl
   
   return(x)
 }
@@ -234,7 +247,9 @@ qic.t <- function(x) {
   x$y   <- x$y^3.6
   x$cl  <- x$cl^3.6
   x$ucl <- x$ucl^3.6
+  x$ucl.95 <- x$ucl.95^3.6
   x$lcl <- x$lcl^3.6
+  x$lcl.95 <- x$lcl.95^3.6
   x$lcl[x$lcl < 0 | is.nan(x$lcl)] <- 0
   
   return(x)
@@ -253,9 +268,13 @@ qic.p <- function(x) {
   
   # Calculate control limits
   x$ucl          <- x$cl + 3 * stdev
+  x$ucl.95       <- x$cl + 2 * stdev
   x$lcl          <- x$cl - 3 * stdev
+  x$lcl.95       <- x$cl - 2 * stdev
   x$ucl[x$ucl > 1 & is.finite(x$ucl)] <- 1
+  x$ucl.95[x$ucl.95 > 1 & is.finite(x$ucl.95)] <- 1
   x$lcl[x$lcl < 0 & is.finite(x$lcl)] <- 0
+  x$lcl.95[x$lcl.95 < 0 & is.finite(x$lcl.95)] <- 0
   
   return(x)
 }
@@ -274,19 +293,34 @@ qic.pp <- function(x) {
   # Calculate standard deviation for Laney's P prime chart, incorporating
   # between-subgroup variation.
   z_i     <- (x$y[base] - x$cl[base]) / stdev[base]
-# TESTING ##############################################
-  if(is.factor(x$x) || is.character(x$x))
+  # TESTING ##############################################
+  if(is.factor(x$x) || is.character(x$x)) {
     sigma_z <- stats::sd(z_i)
-  else
-    sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
-# TESTING ##############################################  
+  } else {
+    mr  <- abs(diff(z_i))
+    amr <- mean(mr, na.rm = TRUE)
+
+    # Upper limit for moving ranges
+    ulmr <- 3.267 * amr
+
+    # Remove moving ranges greater than ulmr and recalculate amr, Nelson 1982
+    mr  <- mr[mr < ulmr]
+    amr <- mean(mr, na.rm = TRUE)
+
+    sigma_z <- amr / 1.128
+  }
+  # TESTING ##############################################  
   
   stdev   <- stdev * sigma_z
   
   x$ucl          <- x$cl + 3 * stdev
+  x$ucl.95       <- x$cl + 2 * stdev
   x$lcl          <- x$cl - 3 * stdev
+  x$lcl.95       <- x$cl - 2 * stdev
   x$ucl[x$ucl > 1 & is.finite(x$ucl)] <- 1
+  x$ucl.95[x$ucl.95 > 1 & is.finite(x$ucl.95)] <- 1
   x$lcl[x$lcl < 0 & is.finite(x$lcl)] <- 0
+  x$lcl.95[x$lcl.95 < 0 & is.finite(x$lcl.95)] <- 0
   
   return(x)
 }
@@ -304,8 +338,11 @@ qic.c <- function(x){
   
   # Calculate control limits
   x$ucl          <- x$cl + 3 * stdev
+  x$ucl.95       <- x$cl + 2 * stdev
   x$lcl          <- x$cl - 3 * stdev
+  x$lcl.95       <- x$cl - 2 * stdev
   x$lcl[x$lcl < 0 & is.finite(x$lcl)] <- 0
+  x$lcl.95[x$lcl.95 < 0 & is.finite(x$lcl.95)] <- 0
   
   return(x)
 }
@@ -322,8 +359,11 @@ qic.u <- function(x){
   
   # Calculate control limits
   x$ucl          <- x$cl + 3 * stdev
+  x$ucl.95       <- x$cl + 2 * stdev
   x$lcl          <- x$cl - 3 * stdev
+  x$lcl.95       <- x$cl - 2 * stdev
   x$lcl[x$lcl < 0 & is.finite(x$lcl)] <- 0
+  x$lcl.95[x$lcl.95 < 0 & is.finite(x$lcl.95)] <- 0
   
   return(x)
 }
@@ -344,18 +384,32 @@ qic.up <- function(x){
   
   # TESTING ##############################################
   # sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
-  if(is.factor(x$x) || is.character(x$x))
+  if(is.factor(x$x) || is.character(x$x)) {
     sigma_z <- stats::sd(z_i)
-  else
-    sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
+  } else {
+    mr  <- abs(diff(z_i))
+    amr <- mean(mr, na.rm = TRUE)
+
+    # Upper limit for moving ranges
+    ulmr <- 3.267 * amr
+
+    # Remove moving ranges greater than ulmr and recalculate amr, Nelson 1982
+    mr  <- mr[mr < ulmr]
+    amr <- mean(mr, na.rm = TRUE)
+
+    sigma_z <- amr / 1.128
+  }
   # TESTING ##############################################  
   
   stdev   <- stdev * sigma_z
   
   # Calculate limits
   x$ucl          <- x$cl + 3 * stdev
+  x$ucl.95       <- x$cl + 2 * stdev
   x$lcl          <- x$cl - 3 * stdev
+  x$lcl.95       <- x$cl - 2 * stdev
   x$lcl[x$lcl < 0 & is.finite(x$lcl)] <- 0
+  x$lcl.95[x$lcl.95 < 0 & is.finite(x$lcl.95)] <- 0
   
   return(x)
 }
@@ -375,8 +429,11 @@ qic.g <- function(x){
   
   # Calculate control limits
   x$ucl          <- x$cl + 3 * stdev
+  x$ucl.95       <- x$cl + 2 * stdev
   x$lcl          <- x$cl - 3 * stdev
+  x$lcl.95       <- x$cl - 2 * stdev
   x$lcl[x$lcl < 0] <- 0
+  x$lcl.95[x$lcl.95 < 0] <- 0
   
   # # Set centre line to theoretical median, Provost (2011) p. 228
   # x$cl <- 0.693 * x$cl
@@ -401,19 +458,22 @@ c5 <- function(n) {
   sqrt(1 - c4(n) ^ 2)
 }
 
-a3 <- function(n) {
+a3 <- function(n, use.95 = FALSE) {
   n[n <= 1] <- NA
-  3 / (c4(n) * sqrt(n))
+  sigma <- ifelse(isTRUE(use.95), 2, 3)
+  sigma / (c4(n) * sqrt(n))
 }
 
-b3 <- function(n) {
+b3 <- function(n, use.95 = FALSE) {
   n[n <= 1] <- NA
-  pmax(0, 1 - 3 * c5(n) / c4(n))
+  sigma <- ifelse(isTRUE(use.95), 2, 3)
+  pmax(0, 1 - sigma * c5(n) / c4(n))
 }
 
-b4 <- function(n) {
+b4 <- function(n, use.95 = FALSE) {
   n[n <= 1] <- NA
-  1 + 3 * c5(n) / c4(n)
+  sigma <- ifelse(isTRUE(use.95), 2, 3)
+  1 + sigma * c5(n) / c4(n)
 }
 
 # Format line labels function
@@ -454,7 +514,7 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
     data.frame(x        = x$x[1],
                facet1   = x$facet1[1],
                facet2   = x$facet2[1],
-               y.sum    = sum(x$y, na.rm = TRUE),
+               y.sum    = sum(x$y, na.rm = length(x$y) > 1),
                y.length = sum(!is.na(x$y)),
                y.mean   = mean(x$y, na.rm = TRUE),
                y.sd     = stats::sd(x$y, na.rm = TRUE),
@@ -482,7 +542,6 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
   d$baseline <- d$xx <= freeze
   d$include  <- !d$xx %in% exclude
   d$notes    <- fixnotes(d$notes)
-  
   d <- split(d, d[c('facet1', 'facet2', 'part')])
   d <- lapply(d, chart.fun)
   d <- lapply(d, runs.analysis, method)
@@ -490,6 +549,8 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
     x$y          <- x$y * multiply
     x$cl         <- x$cl * multiply
     x$lcl        <- x$lcl * multiply
+    x$lcl.95     <- x$lcl.95 * multiply
+    x$ucl.95     <- x$ucl.95 * multiply
     x$ucl        <- x$ucl * multiply
     x$cl.lab     <- ifelse(x$xx == max(x$xx), x$cl, NA)
     x$lcl.lab    <- ifelse(x$xx == max(x$xx), x$lcl, NA)
@@ -502,7 +563,9 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
   
   # Remove control lines from missing subgroups
   d$ucl[!is.finite(d$ucl)]         <- NA
+  d$ucl.95[!is.finite(d$ucl.95)]   <- NA
   d$lcl[!is.finite(d$lcl)]         <- NA
+  d$lcl.95[!is.finite(d$lcl.95)]   <- NA
   d$lcl.lab[!is.finite(d$lcl.lab)] <- NA
   d$ucl.lab[!is.finite(d$ucl.lab)] <- NA
   
@@ -517,6 +580,7 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
   # Prevent negative y axis if y.neg argument is FALSE
   if (!y.neg & min(d$y, na.rm = TRUE) >= 0) {
     d$lcl[d$lcl < 0]         <- 0
+    d$lcl.95[d$lcl.95 < 0]   <- 0
     d$lcl.lab[d$lcl.lab < 0] <- 0
   }
   
@@ -525,7 +589,8 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
 
 .onAttach <- function(libname, pkgname) {
   options(qic.linecol   = '#5DA5DA',
-          qic.signalcol = '#F15854',
+          # qic.signalcol = '#F15854',
+          qic.signalcol = '#FAA43A',
           qic.targetcol = '#059748',
           qic.clshade   = TRUE)
 }

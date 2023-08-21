@@ -1,3 +1,13 @@
+qicharts2 0.7.4
+===============
+* Fix \docType{package} error
+* Screen mr during prime adjustment for pp and up charts (thans to andrjohns).
+* Prevent conversion of missing value to 0 in C chart (thanks to NathanProudlove).
+* Replace the old travis build check with a Github Actions R-CMD-CHECK (thanks to andrjohns).
+* Add option to show 2 sigma limits (thanks to andrjohns).
+* Increased default point size.
+* Change signal colour.
+
 qicharts2 0.7.2
 ===============
 * Fixed bug in plotting categorical (character) subgroups.

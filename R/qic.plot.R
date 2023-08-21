@@ -1,17 +1,19 @@
 #' @import ggplot2
 plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
-                     nrow, ncol, scales, show.labels, show.grid, 
+                     n.facets,
+                     nrow, ncol, scales, show.labels, show.grid, show.95,
                      decimals, flip, dots.only, point.size,
                      x.format, x.angle, x.pad,
                      y.expand, y.percent, y.percent.accuracy, strip.horizontal,
-                     col.line = '#5DA5DA', 
-                     col.signal = '#F15854', 
-                     col.target = '#059748',
+                     # col.line = '#5DA5DA', 
+                     # col.signal = '#F15854', 
+                     # col.target = '#059748',
                      ...) {
   # Set colours
   col1      <- '#8C8C8C' # rgb(140, 140, 140, maxColorValue = 255) # grey
   col2      <- getOption('qic.linecol', default = '#5DA5DA')       # blue
-  col3      <- getOption('qic.signalcol', default = '#F15854')     # red
+  # col3      <- getOption('qic.signalcol', default = '#F15854')     # red
+  col3      <- getOption('qic.signalcol', default = '#FAA43A')     # amber
   col4      <- getOption('qic.targetcol', default = '#059748')     # green
   col5      <- '#C8C8C8' # rgb(200, 200, 200, maxColorValue = 255) # light grey
   cols      <- c('col1' = col1,
@@ -30,8 +32,8 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   lab.just <- ifelse(flip, 'center', -0.2)
   
   # Get number of facet dimensions
-  n.facets <- sum((length(unique(x$facet1))) > 1,
-                  (length(unique(x$facet2)) > 1))
+  # n.facets <- sum((length(unique(x$facet1))) > 1,
+  #                 (length(unique(x$facet2)) > 1))
   
   # Get freeze point
   freeze <- max(x$xx[x$baseline])
@@ -64,14 +66,24 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
     p <- p +
       geom_line(aes_(y = ~ ucl), colour = col1, na.rm = T)
   }
+
+  if (isTRUE(show.95)) {
+    p <- p +
+      geom_line(aes_(y = ~ lcl.95), colour = col1, na.rm = T) +
+      geom_line(aes_(y = ~ ucl.95), colour = col1, na.rm = T)
+  }
   
   p <- p +
-    geom_line(aes_(y = ~ target), colour = col4, na.rm = T)
+    geom_line(aes_(y = ~ target), 
+              colour = col1, 
+              na.rm = T, 
+              # size = 1,
+              linetype = 2)
   
   p <- p +
     geom_line(aes_(y = ~ cl, linetype = ~ runs.signal, colour = ~ linecol),
               na.rm = TRUE) +
-    scale_linetype_manual(values = c('FALSE' = 'solid', 'TRUE' = 'dashed'))
+    scale_linetype_manual(values = c('FALSE' = 'solid', 'TRUE' = 'longdash'))
   
   # Add data points and line
   if (dots.only) {

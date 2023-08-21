@@ -55,6 +55,8 @@
 #'   created with the freeze or part argument.
 #' @param show.labels Logical indicating whether to show labels for centre and
 #'   control lines on chart. Defaults to TRUE when facets argument is NULL.
+#' @param show.95 Logical indicating whether to show 95% (2 sigma)
+#'   control limits on chart. Defaults to FALSE.
 #' @param decimals Integer indicating the preferred number of decimals in centre
 #'   and control line labels.
 #' @param point.size Number specifying the size of data points.
@@ -138,8 +140,9 @@ qic <- function(x,
                 caption            = NULL,
                 part.labels        = NULL,
                 show.labels        = is.null(facets),
+                show.95            = FALSE,
                 decimals           = 1,
-                point.size         = 1.2,
+                point.size         = 1.5,
                 x.period           = NULL,
                 x.format           = NULL,
                 x.angle            = NULL,
@@ -192,6 +195,7 @@ qic <- function(x,
   cl     <- eval(substitute(cl), data, parent.frame())
   target <- eval(substitute(target), data, parent.frame())
   facets <- all.vars(facets)
+  n.facets <- length(facets) 
   
   part <- eval(substitute(part), data, parent.frame())
   
@@ -291,11 +295,13 @@ qic <- function(x,
                 subtitle           = subtitle, 
                 caption            = caption, 
                 part.labels        = part.labels, 
+                n.facets           = n.facets,
                 nrow               = nrow, 
                 ncol               = ncol, 
                 scales             = scales,
                 show.labels        = show.labels,
                 show.grid          = show.grid,
+                show.95            = show.95,
                 decimals           = decimals,
                 flip               = flip,
                 dots.only          = dots.only,

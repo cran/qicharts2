@@ -10,8 +10,7 @@
 #'   infection. \item{month} First day of month. \item {n} Number of cases.
 #'   \item{days} Number of risk days. A risk day is a patient day without
 #'   infection. }
-#' @source \url{https://www.esundhed.dk/Emner/Patienter-og-sygehuse/HAIBA/}
-#'   (Capital Region of Denmark).
+#' @source www.esundhed.dk (Capital Region of Denmark).
 "hospital_infections"
 
 #' Coronary artery bypass graft operations
@@ -37,8 +36,7 @@
 #'   Number of risk days. A risk day is a patient day without CDI. \item{period}
 #'   Factor indicating the period 'pre' or 'post' intervention. \item{notes}
 #'   Annotations. }
-#' @source \url{https://www.esundhed.dk/Emner/Patienter-og-sygehuse/HAIBA/}
-#'   (Amager Hvidovre Hospital).
+#' @source www.esundhed.dk (Amager Hvidovre Hospital).
 "cdi"
 
 #' NHS accidents
@@ -67,6 +65,6 @@
 #'   harm; G-H: Permanent harm; I: Fatal harm. }
 #' @source Omitted for privacy concerns.
 #' @references
-#'   \url{http://www.ihi.org/resources/Pages/Tools/IHIGlobalTriggerToolforMeasuringAEs.aspx}
+#'   \url{https://www.ihi.org/resources/Pages/Tools/IHIGlobalTriggerToolforMeasuringAEs.aspx}
 #'   
 "gtt"
