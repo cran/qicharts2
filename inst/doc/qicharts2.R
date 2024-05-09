@@ -1,4 +1,4 @@
-## ---- echo = FALSE, message=FALSE---------------------------------------------
+## ----echo = FALSE, message=FALSE----------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE, 
   comment = "#>",
@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
 library(qicharts2)
 library(dplyr)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 qic(month, n,
     data  = head(cdi, 24),
     chart = 'c',
@@ -16,14 +16,14 @@ qic(month, n,
     ylab  = 'Count',
     xlab  = 'Month')
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 paretochart(unlist(gtt[7:11]),
             title = 'Pareto chart of patient harm during hospitalisation')
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  install.packages('qicharts2')
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  devtools::install_github('anhoej/qicharts2', build_vignettes = TRUE)
 
 ## -----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ qic(month, n.harmed, n,
     ylab      = NULL,
     xlab      = 'Month')
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  qic(month,
 #      harms > 0,        # TRUE if patient had one or more harms
 #      days > 0,         # Always TRUE
@@ -322,7 +322,7 @@ qic(month, n, days,
     ylab     = 'Cases per 10,000 risk days',
     xlab     = 'Month')
 
-## ---- fig.height=2------------------------------------------------------------
+## ----fig.height=2-------------------------------------------------------------
 qic(month, n, days,
     data     = hospital_infections,
     facets   = ~ infection,
@@ -332,7 +332,7 @@ qic(month, n, days,
     ylab     = 'Cases per 10,000 risk days',
     xlab     = 'Month')
 
-## ---- fig.height=4------------------------------------------------------------
+## ----fig.height=4-------------------------------------------------------------
 qic(month, n, days,
     data     = hospital_infections,
     facets   = infection ~ hospital,
@@ -344,7 +344,7 @@ qic(month, n, days,
     ylab     = 'Cases per 10,000 risk days',
     xlab     = 'Month')
 
-## ---- fig.height=7------------------------------------------------------------
+## ----fig.height=7-------------------------------------------------------------
 hai_2016 <- hospital_infections %>% 
   filter(month    >= '2016-07-01') %>% 
   mutate(hospital = reorder(hospital, days))
@@ -395,7 +395,7 @@ qic(i, r,
     ylab     = NULL,
     xlab     = 'Week #')
 
-## ---- fig.width=3.45, fig.height=2.3, results='hold', echo=FALSE--------------
+## ----fig.width=3.45, fig.height=2.3, results='hold', echo=FALSE---------------
 qic(month, readmissions, 
     n         = n,
     data      = cabg_by_month,
@@ -416,7 +416,7 @@ qic(month, readmissions,
     ylab      = NULL,
     xlab      = 'Month')
 
-## ---- results='asis'----------------------------------------------------------
+## ----results='asis'-----------------------------------------------------------
 n <- 10:100
 x <- data.frame(
   `Number of useful observations`       = n,

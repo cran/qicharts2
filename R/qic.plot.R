@@ -78,7 +78,7 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
               colour = col1, 
               na.rm = T, 
               # size = 1,
-              linetype = 2)
+              linetype = 3)
   
   p <- p +
     geom_line(aes_(y = ~ cl, linetype = ~ runs.signal, colour = ~ linecol),
@@ -224,13 +224,8 @@ plot.qic <- function(x, title, ylab, xlab, subtitle, caption, part.labels,
   # Add space for line labels
   subgroups <- unique(x$x)
   
-  # TESTING ##########################
-  # if (is.factor(subgroups))
-  #   subgroups <- as.numeric(subgroups)
-  
   if(is.character(subgroups) || is.factor(subgroups))
     subgroups <- seq_along(subgroups)
-  # TESTING ##########################
   
   p <- p +
     expand_limits(x = max((subgroups)) +
