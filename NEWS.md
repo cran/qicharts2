@@ -1,8 +1,14 @@
+qicharts2 0.8.0
+===============
+* Add option qic.mrscreened.
+* Add I prime chart (ip).
+
 qicharts2 0.7.5
 ===============
 * Build for R 4.4.0
 * Minor fixes to docs
 * Change target line to dotted
+
 
 qicharts2 0.7.4
 ===============

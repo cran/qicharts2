@@ -27,7 +27,7 @@ runs.analysis <- function(x, method) {
     n.crossings.min  <- NA
     runs.signal      <- FALSE
   }
-
+  
   x$n.obs           <- n.obs
   x$n.useful        <- n.useful
   x$runs.signal     <- runs.signal
@@ -145,12 +145,13 @@ qic.i <- function(x) {
   mr  <- abs(diff(x$y[base] - x$cl[base]))
   amr <- mean(mr, na.rm = TRUE)
   
-  # Upper limit for moving ranges
-  ulmr <- 3.267 * amr
-  
   # Remove moving ranges greater than ulmr and recalculate amr, Nelson 1982
-  mr  <- mr[mr < ulmr]
-  amr <- mean(mr, na.rm = TRUE)
+  if (getOption('qic.screenedmr', default = FALSE)) {
+    # Upper limit for moving ranges
+    ulmr <- 3.267 * amr
+    mr  <- mr[mr < ulmr]
+    amr <- mean(mr, na.rm = TRUE)
+  }
   
   # Calculate standard deviation, Montgomery, 6.33
   stdev <- amr / 1.128
@@ -177,6 +178,46 @@ qic.mr <- function(x) {
   x$lcl.95 <- 0
   x$ucl <- 3.267 * x$cl
   x$ucl.95 <- (3.267 / 3) * 2 * x$cl
+  
+  return(x)
+}
+
+qic.ip <- function(x) {
+  base <- x$baseline & x$include
+  
+  # Fix missing denominator
+  if (all(is.na(x$n))) {
+    x$n <- x$y.length
+  }
+  
+  if (anyNA(x$cl)) {
+    # x$cl <- sum(x$y.sum[base], na.rm = TRUE) / sum(x$n[base], na.rm = TRUE)
+    x$cl <- sum(x$y[base] * x$n[base], na.rm = TRUE) / 
+      sum(x$n[base], na.rm = TRUE)
+  }
+  
+  # Standard deviation
+  l     <- nrow(x)
+  d1    <- abs(diff(x$y, na.rm = T))
+  d2    <- sqrt((1 / x$n[1:(l - 1)]) + (1 / x$n[2:l]))
+  s     <- sqrt(pi / 2) * d1 / d2
+  
+  # remove s values above upper limit before calculating stdev
+  if (getOption('qic.screenedmr', default = FALSE)) {
+    as <- mean(s, na.rm = T)
+    uls <- as * 3.2665
+    s  <- s[s < uls]
+  }
+  
+  as <- mean(s, na.rm = TRUE)
+  stdev <- as * sqrt(1 / x$n)
+  # stdev <- mean(s, na.rm = T) * sqrt(1 / x$n)
+  
+  # Calculate control limits
+  x$lcl    <- x$cl - 3 * stdev
+  x$ucl    <- x$cl + 3 * stdev
+  x$lcl.95 <- x$cl - 2 * stdev
+  x$ucl.95 <- x$cl + 2 * stdev
   
   return(x)
 }
@@ -222,6 +263,7 @@ qic.s <- function(x){
       x$cl <- mean(x$y.sd[base], na.rm = TRUE)
     }
   }
+  
   B3        <- b3(x$y.length)
   B3.95     <- b3(x$y.length, use.95=TRUE)
   B4        <- b4(x$y.length)
@@ -293,23 +335,24 @@ qic.pp <- function(x) {
   # Calculate standard deviation for Laney's P prime chart, incorporating
   # between-subgroup variation.
   z_i     <- (x$y[base] - x$cl[base]) / stdev[base]
-  # TESTING ##############################################
+  
   if(is.factor(x$x) || is.character(x$x)) {
     sigma_z <- stats::sd(z_i)
   } else {
     mr  <- abs(diff(z_i))
     amr <- mean(mr, na.rm = TRUE)
-
+    
     # Upper limit for moving ranges
     ulmr <- 3.267 * amr
-
+    
     # Remove moving ranges greater than ulmr and recalculate amr, Nelson 1982
-    mr  <- mr[mr < ulmr]
-    amr <- mean(mr, na.rm = TRUE)
-
+    if (getOption('qic.screenedmr', default = FALSE)) {
+      mr  <- mr[mr < ulmr]
+      amr <- mean(mr, na.rm = TRUE)
+    }
+    
     sigma_z <- amr / 1.128
   }
-  # TESTING ##############################################  
   
   stdev   <- stdev * sigma_z
   
@@ -382,24 +425,24 @@ qic.up <- function(x){
   # between-subgroup variation.
   z_i     <- (x$y[base] - x$cl[base]) / stdev[base]
   
-  # TESTING ##############################################
   # sigma_z <- mean(abs(diff(z_i)), na.rm = TRUE) / 1.128
   if(is.factor(x$x) || is.character(x$x)) {
     sigma_z <- stats::sd(z_i)
   } else {
     mr  <- abs(diff(z_i))
     amr <- mean(mr, na.rm = TRUE)
-
-    # Upper limit for moving ranges
-    ulmr <- 3.267 * amr
-
+    
     # Remove moving ranges greater than ulmr and recalculate amr, Nelson 1982
-    mr  <- mr[mr < ulmr]
-    amr <- mean(mr, na.rm = TRUE)
-
+    if (getOption('qic.screenedmr', default = FALSE)) {
+      # Upper limit for moving ranges
+      ulmr <- 3.267 * amr
+      
+      mr  <- mr[mr < ulmr]
+      amr <- mean(mr, na.rm = TRUE)
+    }
+    
     sigma_z <- amr / 1.128
   }
-  # TESTING ##############################################  
   
   stdev   <- stdev * sigma_z
   
@@ -419,10 +462,10 @@ qic.g <- function(x){
   
   # Calculate centre line
   calccl <- anyNA(x$cl)
+  
   if (anyNA(x$cl)) {
     x$cl <- mean(x$y[base], na.rm = TRUE)
   }
-  
   
   # Calculate standard deviation, Montgomery, p. 319
   stdev <- sqrt(x$cl * (x$cl + 1))
@@ -588,16 +631,17 @@ qic.agg <- function(d, got.n, part, agg.fun, freeze, exclude,
 }
 
 .onAttach <- function(libname, pkgname) {
-  options(qic.linecol   = '#5DA5DA',
-          # qic.signalcol = '#F15854',
-          qic.signalcol = '#FAA43A',
-          qic.targetcol = '#059748',
-          qic.clshade   = TRUE)
+  options(qic.linecol    = '#5DA5DA',
+          qic.signalcol  = '#FAA43A',
+          qic.targetcol  = '#059748',
+          qic.clshade    = TRUE,
+          qic.screenedmr = TRUE)
 }
 
 .onDetach <- function(libpath) {
-  options(qic.linecol   = NULL,
-          qic.signalcol = NULL,
-          qic.targetcol = NULL,
-          qic.clshade   = NULL)
+  options(qic.linecol    = NULL,
+          qic.signalcol  = NULL,
+          qic.targetcol  = NULL,
+          qic.clshade    = NULL,
+          qic.screenedmr = NULL)
 }

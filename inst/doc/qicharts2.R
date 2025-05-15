@@ -21,10 +21,10 @@ paretochart(unlist(gtt[7:11]),
             title = 'Pareto chart of patient harm during hospitalisation')
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  install.packages('qicharts2')
+# install.packages('qicharts2')
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  devtools::install_github('anhoej/qicharts2', build_vignettes = TRUE)
+# devtools::install_github('anhoej/qicharts2', build_vignettes = TRUE)
 
 ## -----------------------------------------------------------------------------
 # Load qicharts2
@@ -113,15 +113,15 @@ qic(month, n.harmed, n,
     xlab      = 'Month')
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  qic(month,
-#      harms > 0,        # TRUE if patient had one or more harms
-#      days > 0,         # Always TRUE
-#      data      = gtt,
-#      chart     = 'p',
-#      y.percent = TRUE,
-#      title     = 'Harmed patients (P chart)',
-#      ylab      = NULL,
-#      xlab      = 'Month')
+# qic(month,
+#     harms > 0,        # TRUE if patient had one or more harms
+#     days > 0,         # Always TRUE
+#     data      = gtt,
+#     chart     = 'p',
+#     y.percent = TRUE,
+#     title     = 'Harmed patients (P chart)',
+#     ylab      = NULL,
+#     xlab      = 'Month')
 
 ## -----------------------------------------------------------------------------
 suppressPackageStartupMessages(library(tidyr))
